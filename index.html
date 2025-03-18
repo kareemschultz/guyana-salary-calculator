@@ -20,6 +20,18 @@
         <div class="spinner"></div>
     </div>
 
+    <!-- Theme Toggle -->
+    <div class="theme-toggle-container">
+        <div class="theme-toggle">
+            <input type="checkbox" id="theme-toggle" />
+            <label for="theme-toggle" class="toggle-label">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-moon"></i>
+                <span class="toggle-ball"></span>
+            </label>
+        </div>
+    </div>
+
     <div class="app-header">
         <div class="container-fluid">
             <div class="row align-items-center">
@@ -90,6 +102,35 @@
                                 <input type="date" class="form-control" id="calculation-date">
                                 <div class="form-text">Date for salary calculation (today or future date)</div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Position Presets Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">
+                            <i class="fas fa-briefcase"></i> Position Presets
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3 small">Quickly set salary and allowances based on ICT job positions:</p>
+                        <div class="preset-container d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary position-preset" data-position="ict-tech-1">
+                                ICT Technician I
+                            </button>
+                            <button class="btn btn-outline-primary position-preset" data-position="ict-tech-2">
+                                ICT Technician II
+                            </button>
+                            <button class="btn btn-outline-primary position-preset" data-position="ict-tech-3">
+                                ICT Technician III
+                            </button>
+                            <button class="btn btn-outline-primary position-preset" data-position="assist-ict-eng-3">
+                                Assistant ICT Engineer III
+                            </button>
+                            <button class="btn btn-outline-primary position-preset" data-position="ict-eng-3">
+                                ICT Engineer III
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -292,22 +333,14 @@
                                     </div>
                                 </div>
                                 <div class="row mb-2">
+                                    <!-- Combined Telephone & Internet Allowance -->
                                     <div class="col-md-6 mb-2">
-                                        <label for="telephone-allowance" class="form-label">Telephone & Security</label>
+                                        <label for="telecom-allowance" class="form-label">Telephone & Internet Allowance</label>
                                         <div class="input-group">
                                             <span class="input-group-text">GYD $</span>
-                                            <input type="number" class="form-control non-taxable-allowance" id="telephone-allowance" placeholder="0">
+                                            <input type="number" class="form-control non-taxable-allowance" id="telecom-allowance" placeholder="0">
                                         </div>
                                     </div>
-                                    <div class="col-md-6 mb-2">
-                                        <label for="internet-allowance" class="form-label">Internet Allowance</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">GYD $</span>
-                                            <input type="number" class="form-control non-taxable-allowance" id="internet-allowance" placeholder="0">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-md-6 mb-2">
                                         <label for="laundry-allowance" class="form-label">Laundry Allowance</label>
                                         <div class="input-group">
@@ -315,6 +348,8 @@
                                             <input type="number" class="form-control non-taxable-allowance" id="laundry-allowance" placeholder="0">
                                         </div>
                                     </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-md-6 mb-2">
                                         <label for="other-non-taxable" class="form-label">Other Non-Taxable</label>
                                         <div class="input-group">
@@ -322,9 +357,7 @@
                                             <input type="number" class="form-control non-taxable-allowance" id="other-non-taxable" placeholder="0">
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
+                                    <div class="col-md-6 mb-2">
                                         <label class="form-label">Total Non-Taxable Allowances</label>
                                         <div class="form-control bg-light" id="non-taxable-allowances-total">GYD $0.00</div>
                                     </div>
@@ -507,7 +540,7 @@
                                 <label for="gratuity-rate" class="form-label">
                                     Gratuity Rate (%)
                                     <i class="fas fa-question-circle info-tooltip" 
-                                       data-bs-toggle="tooltip" 
+                                       data-bs-toggle="tooltip"
                                        title="Standard gratuity rate is 22.5% of basic salary per month."></i>
                                 </label>
                                 <input type="number" class="form-control" id="gratuity-rate" value="22.5" step="0.1">
@@ -659,7 +692,7 @@
                     </div>
                 </div>
 
-                <!-- Package Breakdown Card - Corrected Version -->
+                <!-- Package Breakdown Card -->
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="section-title mb-0">
@@ -746,6 +779,48 @@
                     <div class="card-body">
                         <div class="chart-container">
                             <canvas id="tax-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cash Flow Chart -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">
+                            <i class="fas fa-money-bill-wave"></i> Annual Cash Flow
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="cash-flow-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tax Savings Chart -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">
+                            <i class="fas fa-hand-holding-usd"></i> Tax Savings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="tax-savings-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Net vs Gross Chart -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">
+                            <i class="fas fa-balance-scale"></i> Net vs. Gross Income
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="net-vs-gross-chart"></canvas>
                         </div>
                     </div>
                 </div>

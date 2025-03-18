@@ -125,6 +125,29 @@ function setupEventListeners() {
     nonTaxableAllowances.forEach(function(input) {
         input.addEventListener('input', calculateNonTaxableAllowancesTotal);
     });
+    
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('change', function() {
+            toggleDarkMode(this.checked);
+        });
+    }
+    
+    // Position preset buttons
+    const positionPresets = document.querySelectorAll('.position-preset');
+    positionPresets.forEach(function(button) {
+        button.addEventListener('click', function() {
+            const presetId = this.getAttribute('data-position');
+            applyPositionPreset(presetId);
+            
+            // Highlight the selected button
+            positionPresets.forEach(btn => btn.classList.remove('btn-primary'));
+            positionPresets.forEach(btn => btn.classList.add('btn-outline-primary'));
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-primary');
+        });
+    });
 
     // Initialize tooltips
     initializeTooltips();
@@ -242,7 +265,19 @@ function updateResultsDisplay(results) {
         results.nonTaxableAllowances, 
         results.monthlyGratuityAccrual
     );
+    
     createTaxChart(results.taxableIncome, results.incomeTax);
+    
+    // New visualizations
+    createCashFlowChart(
+        results.monthlyNetSalary,
+        results.sixMonthGratuity,
+        results.vacationAllowance
+    );
+    
+    createTaxSavingsChart(results);
+    
+    createNetVsGrossChart(results);
     
     // Scroll to results on mobile
     if (window.innerWidth < 992) {

@@ -25,3 +25,78 @@ const INSURANCE_PREMIUMS = {
     'family': 4970,
     'custom': 'custom'
 };
+
+// Position presets for ICT positions
+const POSITION_PRESETS = {
+    'ict-tech-1': {
+        title: 'ICT Technician I',
+        baseSalary: 206300,
+        taxableAllowances: {
+            duty: 15000,
+            uniform: 5000
+        },
+        nonTaxableAllowances: {
+            travel: 0,
+            telecom: 0
+        },
+        // Vacation allowance is calculated dynamically as gross salary
+        totalTaxableAllowances: 20000, // Sum of all taxable allowances
+        totalNonTaxableAllowances: 0    // Sum of all non-taxable allowances (excluding vacation)
+    },
+    'ict-tech-2': {
+        title: 'ICT Technician II',
+        baseSalary: 176564,
+        taxableAllowances: {
+            duty: 12000,
+            uniform: 5000
+        },
+        nonTaxableAllowances: {
+            travel: 0,
+            telecom: 0
+        },
+        totalTaxableAllowances: 17000,
+        totalNonTaxableAllowances: 0
+    },
+    'ict-tech-3': {
+        title: 'ICT Technician III',
+        baseSalary: 148051,
+        taxableAllowances: {
+            duty: 10000,
+            uniform: 5000
+        },
+        nonTaxableAllowances: {
+            travel: 0,
+            telecom: 0
+        },
+        totalTaxableAllowances: 15000,
+        totalNonTaxableAllowances: 0
+    },
+    'assist-ict-eng-3': {
+        title: 'Assistant ICT Engineer III',
+        baseSalary: 285685,
+        taxableAllowances: {
+            duty: 0,
+            uniform: 5000
+        },
+        nonTaxableAllowances: {
+            travel: 5000,
+            telecom: 5000
+        },
+        totalTaxableAllowances: 5000,
+        totalNonTaxableAllowances: 10000
+    },
+    'ict-eng-3': {
+        title: 'ICT Engineer III',
+        baseSalary: 370000,
+        taxableAllowances: {
+            duty: 80000,
+            uniform: 5000
+        },
+        nonTaxableAllowances: {
+            travel: 10000,
+            telecom: 5000
+        },
+        totalTaxableAllowances: 85000,
+        totalNonTaxableAllowances: 15000
+    }
+};

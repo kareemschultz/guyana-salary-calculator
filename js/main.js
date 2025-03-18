@@ -6,6 +6,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     debug('DOM fully loaded - initializing calculator');
     
+    // Initialize theme
+    initializeTheme();
+    
     // Set default dates
     setDefaultDates();
     
