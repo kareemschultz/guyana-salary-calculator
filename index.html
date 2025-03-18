@@ -10,301 +10,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Chart.js for visualizations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
-        :root {
-            --primary: #1e40af; /* Rich blue */
-            --primary-light: #e0e7ff;
-            --secondary: #059669;
-            --danger: #dc2626;
-            --warning: #d97706;
-            --success: #059669;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-600: #4b5563;
-            --gray-800: #1f2937;
-            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-            --radius: 0.5rem;
-        }
-        
-        body {
-            background-color: #f9fafb;
-            color: var(--gray-800);
-            line-height: 1.6;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-        
-        .container-fluid {
-            max-width: 1400px;
-        }
-        
-        .card {
-            border: none;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 1.5rem;
-            background-color: white;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid var(--gray-200);
-            padding: 1.25rem 1.5rem;
-        }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .app-header {
-            background: linear-gradient(135deg, #1e40af, #2563eb);
-            color: white;
-            padding: 2rem 1rem;
-            margin-bottom: 2rem;
-            border-radius: 0 0 var(--radius) var(--radius);
-            box-shadow: var(--shadow);
-        }
-        
-        .app-header h1 {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .app-header p {
-            opacity: 0.9;
-            margin-bottom: 0;
-        }
-        
-        .section-title {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 1.25rem;
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .section-title i {
-            font-size: 1rem;
-        }
-        
-        label {
-            font-weight: 500;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            color: var(--gray-600);
-        }
-        
-        .form-text {
-            font-size: 0.8rem;
-            color: var(--gray-600);
-        }
-        
-        .input-group-text {
-            background-color: var(--gray-100);
-            color: var(--gray-600);
-            border-color: var(--gray-300);
-        }
-        
-        .form-control, .form-select {
-            border-color: var(--gray-300);
-            padding: 0.6rem 0.75rem;
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 0.25rem rgba(30, 64, 175, 0.15);
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-            padding: 0.6rem 1.5rem;
-            font-weight: 500;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .btn-primary:hover {
-            background-color: #1c3879;
-            border-color: #1c3879;
-        }
-        
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        
-        .result-row:last-child {
-            border-bottom: none;
-        }
-        
-        .result-label {
-            color: var(--gray-600);
-        }
-        
-        .result-value {
-            font-weight: 600;
-        }
-        
-        .total-row {
-            font-size: 1.1rem;
-            padding-top: 1rem;
-            margin-top: 0.5rem;
-            border-top: 2px solid var(--primary);
-        }
-        
-        .total-row .result-label, .total-row .result-value {
-            font-weight: 700;
-            color: var(--gray-800);
-        }
-        
-        .positive {
-            color: var(--success);
-        }
-        
-        .negative {
-            color: var(--danger);
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 250px;
-            margin-top: 1rem;
-        }
-        
-        .allowances-info i {
-            color: var(--warning);
-            cursor: pointer;
-        }
-        
-        .tooltip-inner {
-            max-width: 300px;
-            text-align: left;
-        }
-        
-        .tax-info {
-            background-color: var(--primary-light);
-            padding: 1rem;
-            border-radius: var(--radius);
-            margin-top: 1rem;
-        }
-        
-        .tax-info-title {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .allowances-toggle {
-            color: var(--primary);
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-        
-        .allowances-toggle:hover {
-            text-decoration: underline;
-        }
-        
-        .allowance-badge {
-            border-radius: 9999px;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .taxable {
-            background-color: #fee2e2;
-            color: #b91c1c;
-        }
-        
-        .non-taxable {
-            background-color: #d1fae5;
-            color: #047857;
-        }
-        
-        .info-tooltip {
-            color: var(--primary);
-            margin-left: 0.25rem;
-            cursor: pointer;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 1.5rem;
-            color: var(--gray-600);
-            font-size: 0.875rem;
-            border-top: 1px solid var(--gray-200);
-            margin-top: 2rem;
-        }
-        
-        @media (max-width: 992px) {
-            .container-fluid {
-                padding: 0 1rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .app-header {
-                padding: 1.5rem 1rem;
-                margin-bottom: 1.5rem;
-            }
-            
-            .card-body {
-                padding: 1.25rem;
-            }
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .results-section .card {
-            animation: fadeIn 0.5s ease forwards;
-        }
-        
-        /* Loading spinner */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            display: none;
-        }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid var(--gray-300);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -952,647 +659,115 @@
                     </div>
                 </div>
 
+                <!-- Package Breakdown Card - Corrected Version -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">
+                            <i class="fas fa-box-open"></i> Special Payment Months
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Month 6 Package -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary"><i class="fas fa-calendar-alt me-2"></i>Month 6 Payment</h6>
+                            <div class="result-row">
+                                <span class="result-label">Regular Monthly Net Salary:</span>
+                                <span class="result-value" id="result-month-six-net">$0.00</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Gratuity Payment (22.5% × 6 months):</span>
+                                <span class="result-value positive" id="result-month-six-gratuity">$0.00</span>
+                            </div>
+                            <div class="result-row total-row">
+                                <span class="result-label">MONTH 6 TOTAL PAYMENT:</span>
+                                <span class="result-value" id="result-month-six-total">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Month 12 Package -->
+                        <div>
+                            <h6 class="fw-bold text-primary"><i class="fas fa-calendar me-2"></i>Month 12 Payment</h6>
+                            <div class="result-row">
+                                <span class="result-label">Regular Monthly Net Salary:</span>
+                                <span class="result-value" id="result-month-twelve-net">$0.00</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Gratuity Payment (22.5% × 6 months):</span>
+                                <span class="result-value positive" id="result-month-twelve-gratuity">$0.00</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Vacation Allowance (Annual):</span>
+                                <span class="result-value positive" id="result-month-twelve-vacation">$0.00</span>
+                            </div>
+                            <div class="result-row total-row">
+                                <span class="result-label">MONTH 12 TOTAL PAYMENT:</span>
+                                <span class="result-value" id="result-month-twelve-total">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Structure Information -->
+                        <div class="tax-info mt-4">
+                            <div class="tax-info-title">
+                                <i class="fas fa-info-circle me-2"></i> Payment Structure Information
+                            </div>
+                            <p class="mb-0 small">
+                                This calculator shows what you'll actually receive in your special payment months:
+                            </p>
+                            <ul class="mb-0 small mt-2">
+                                <li><strong>Month 6:</strong> Your regular net salary plus gratuity payment (accumulated at 22.5% of basic salary over 6 months)</li>
+                                <li><strong>Month 12:</strong> Your regular net salary plus gratuity payment plus annual vacation allowance</li>
+                                <li><strong>Regular Months:</strong> You receive only your regular monthly net salary (shown in the Monthly Results section)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
 
-<!-- Package Breakdown Card - Corrected Version -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="section-title mb-0">
-            <i class="fas fa-box-open"></i> Special Payment Months
-        </h5>
-    </div>
-    <div class="card-body">
-        <!-- Month 6 Package -->
-        <div class="mb-4">
-            <h6 class="fw-bold text-primary"><i class="fas fa-calendar-alt me-2"></i>Month 6 Payment</h6>
-            <div class="result-row">
-                <span class="result-label">Regular Monthly Net Salary:</span>
-                <span class="result-value" id="result-month-six-net">$0.00</span>
-            </div>
-            <div class="result-row">
-                <span class="result-label">Gratuity Payment (22.5% × 6 months):</span>
-                <span class="result-value positive" id="result-month-six-gratuity">$0.00</span>
-            </div>
-            <div class="result-row total-row">
-                <span class="result-label">MONTH 6 TOTAL PAYMENT:</span>
-                <span class="result-value" id="result-month-six-total">$0.00</span>
+                <!-- Income Breakdown Chart -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">
+                            <i class="fas fa-chart-pie"></i> Income Breakdown
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="income-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tax Bracket Visualization -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">
+                            <i class="fas fa-chart-bar"></i> Tax Bracket Analysis
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="tax-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <!-- Month 12 Package -->
-        <div>
-            <h6 class="fw-bold text-primary"><i class="fas fa-calendar me-2"></i>Month 12 Payment</h6>
-            <div class="result-row">
-                <span class="result-label">Regular Monthly Net Salary:</span>
-                <span class="result-value" id="result-month-twelve-net">$0.00</span>
-            </div>
-            <div class="result-row">
-                <span class="result-label">Gratuity Payment (22.5% × 6 months):</span>
-                <span class="result-value positive" id="result-month-twelve-gratuity">$0.00</span>
-            </div>
-            <div class="result-row">
-                <span class="result-label">Vacation Allowance (Annual):</span>
-                <span class="result-value positive" id="result-month-twelve-vacation">$0.00</span>
-            </div>
-            <div class="result-row total-row">
-                <span class="result-label">MONTH 12 TOTAL PAYMENT:</span>
-                <span class="result-value" id="result-month-twelve-total">$0.00</span>
-            </div>
-        </div>
-        
-        <!-- Payment Structure Information -->
-        <div class="tax-info mt-4">
-            <div class="tax-info-title">
-                <i class="fas fa-info-circle me-2"></i> Payment Structure Information
-            </div>
-            <p class="mb-0 small">
-                This calculator shows what you'll actually receive in your special payment months:
-            </p>
-            <ul class="mb-0 small mt-2">
-                <li><strong>Month 6:</strong> Your regular net salary plus gratuity payment (accumulated at 22.5% of basic salary over 6 months)</li>
-                <li><strong>Month 12:</strong> Your regular net salary plus gratuity payment plus annual vacation allowance</li>
-                <li><strong>Regular Months:</strong> You receive only your regular monthly net salary (shown in the Monthly Results section)</li>
-            </ul>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>This calculator is based on Guyana 2025 Tax Regulations. Always consult with a tax professional for official advice.</p>
+            <p>Includes Taxable and Non-Taxable allowances classification as per Guyana Revenue Authority guidelines.</p>
         </div>
     </div>
-</div>
 
-<!-- Income Breakdown Chart -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="section-title mb-0">
-            <i class="fas fa-chart-pie"></i> Income Breakdown
-        </h5>
-    </div>
-    <div class="card-body">
-        <div class="chart-container">
-            <canvas id="income-chart"></canvas>
-        </div>
-    </div>
-</div>
-
-<!-- Tax Bracket Visualization -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="section-title mb-0">
-            <i class="fas fa-chart-bar"></i> Tax Bracket Analysis
-        </h5>
-    </div>
-    <div class="card-body">
-        <div class="chart-container">
-            <canvas id="tax-chart"></canvas>
-        </div>
-    </div>
-</div>
-</div>
-</div>
-
-<!-- Footer -->
-<div class="footer">
-<p>This calculator is based on Guyana 2025 Tax Regulations. Always consult with a tax professional for official advice.</p>
-<p>Includes Taxable and Non-Taxable allowances classification as per Guyana Revenue Authority guidelines.</p>
-</div>
-</div>
-
-<!-- Bootstrap and other scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
-<script>
-// Constants for tax calculation
-const TAX_RATE_1 = 0.25; // 25% on income up to $260,000 monthly
-const TAX_RATE_2 = 0.35; // 35% on income above $260,000 monthly
-const TAX_THRESHOLD = 260000; // Monthly threshold
-const PERSONAL_ALLOWANCE = 130000; // Monthly personal allowance
-const NIS_RATE = 0.056; // 5.6%
-const NIS_CEILING = 280000; // Monthly ceiling
-const CHILD_ALLOWANCE = 10000; // Per child
-const OVERTIME_ALLOWANCE_MAX = 50000; // Maximum overtime allowance
-const SECOND_JOB_ALLOWANCE_MAX = 50000; // Maximum second job allowance
-
-// Insurance premiums
-const INSURANCE_PREMIUMS = {
-'none': 0,
-'employee': 1469,
-'employee-one': 3182,
-'family': 4970,
-'custom': 'custom'
-};
-
-// Charts
-let incomeChart = null;
-let taxChart = null;
-
-// Format currency function
-function formatCurrency(amount) {
-return '$' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-}
-
-// DOM elements
-document.addEventListener('DOMContentLoaded', function() {
-console.log('DOM fully loaded');
-
-// Initialize tooltips
-const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-tooltipTriggerList.map(function (tooltipTriggerEl) {
-return new bootstrap.Tooltip(tooltipTriggerEl, {
-    html: true
-});
-});
-
-// DOM element references
-const calculateBtn = document.getElementById('calculate-btn');
-console.log('Calculate button found:', calculateBtn);
-
-const toggleTaxableAllowances = document.getElementById('toggle-taxable-allowances');
-const toggleNonTaxableAllowances = document.getElementById('toggle-non-taxable-allowances');
-const toggleSecondJob = document.getElementById('toggle-second-job');
-const insuranceDropdown = document.getElementById('insurance');
-const loadingOverlay = document.getElementById('loading-overlay');
-
-// Set default dates
-const today = new Date();
-document.getElementById('calculation-date').valueAsDate = today;
-
-const sixMonthsAgo = new Date();
-sixMonthsAgo.setMonth(today.getMonth() - 6);
-document.getElementById('start-date').valueAsDate = sixMonthsAgo;
-
-// Hide/show second job section
-if (toggleSecondJob) {
-toggleSecondJob.addEventListener('click', function(e) {
-    e.preventDefault();
-    const secondJobSection = document.getElementById('second-job-section');
-    secondJobSection.classList.toggle('d-none');
-
-    const icon = this.querySelector('i');
-    const text = this.querySelector('span');
-
-    if (secondJobSection.classList.contains('d-none')) {
-        icon.classList.remove('fa-minus-circle');
-        icon.classList.add('fa-plus-circle');
-        text.textContent = 'Add Second Job Income';
-        document.getElementById('second-job').value = '';
-    } else {
-        icon.classList.remove('fa-plus-circle');
-        icon.classList.add('fa-minus-circle');
-        text.textContent = 'Remove Second Job Income';
-    }
-});
-}
-
-// Hide/show taxable allowances breakdown
-if (toggleTaxableAllowances) {
-toggleTaxableAllowances.addEventListener('click', function(e) {
-    e.preventDefault();
-    const singleSection = document.getElementById('single-taxable-allowance');
-    const multipleSection = document.getElementById('multiple-taxable-allowances');
-
-    singleSection.classList.toggle('d-none');
-    multipleSection.classList.toggle('d-none');
-
-    const icon = this.querySelector('i');
-    const text = this.querySelector('span');
-
-    if (multipleSection.classList.contains('d-none')) {
-        icon.classList.remove('fa-minus-circle');
-        icon.classList.add('fa-plus-circle');
-        text.textContent = 'Add Multiple';
-    } else {
-        icon.classList.remove('fa-plus-circle');
-        icon.classList.add('fa-minus-circle');
-        text.textContent = 'Show Single';
-        
-        // Calculate total when switching to multiple
-        calculateTaxableAllowancesTotal();
-    }
-});
-}
-
-// Hide/show non-taxable allowances breakdown
-if (toggleNonTaxableAllowances) {
-toggleNonTaxableAllowances.addEventListener('click', function(e) {
-    e.preventDefault();
-    const singleSection = document.getElementById('single-non-taxable-allowance');
-    const multipleSection = document.getElementById('multiple-non-taxable-allowances');
-
-    singleSection.classList.toggle('d-none');
-    multipleSection.classList.toggle('d-none');
-
-    const icon = this.querySelector('i');
-    const text = this.querySelector('span');
-
-    if (multipleSection.classList.contains('d-none')) {
-        icon.classList.remove('fa-minus-circle');
-        icon.classList.add('fa-plus-circle');
-        text.textContent = 'Add Multiple';
-    } else {
-        icon.classList.remove('fa-plus-circle');
-        icon.classList.add('fa-minus-circle');
-        text.textContent = 'Show Single';
-        
-        // Calculate total when switching to multiple
-        calculateNonTaxableAllowancesTotal();
-    }
-});
-}
-
-// Calculate taxable allowances total
-function calculateTaxableAllowancesTotal() {
-let total = 0;
-document.querySelectorAll('.taxable-allowance').forEach(function(input) {
-    total += parseFloat(input.value) || 0;
-});
-
-const totalElement = document.getElementById('taxable-allowances-total');
-if (totalElement) {
-    totalElement.textContent = 'GYD $' + total.toFixed(2);
-}
-
-// Update the single input field too
-if (document.getElementById('single-taxable-allowance') && 
-    !document.getElementById('single-taxable-allowance').classList.contains('d-none')) {
-    document.getElementById('taxable-allowances').value = total;
-}
-}
-
-// Add event listeners to taxable allowances
-const taxableAllowances = document.querySelectorAll('.taxable-allowance');
-taxableAllowances.forEach(function(input) {
-input.addEventListener('input', calculateTaxableAllowancesTotal);
-});
-
-// Calculate non-taxable allowances total
-function calculateNonTaxableAllowancesTotal() {
-let total = 0;
-document.querySelectorAll('.non-taxable-allowance').forEach(function(input) {
-    total += parseFloat(input.value) || 0;
-});
-
-const totalElement = document.getElementById('non-taxable-allowances-total');
-if (totalElement) {
-    totalElement.textContent = 'GYD $' + total.toFixed(2);
-}
-
-// Update the single input field too
-if (document.getElementById('single-non-taxable-allowance') && 
-    !document.getElementById('single-non-taxable-allowance').classList.contains('d-none')) {
-    document.getElementById('non-taxable-allowances').value = total;
-}
-}
-
-// Add event listeners to non-taxable allowances
-const nonTaxableAllowances = document.querySelectorAll('.non-taxable-allowance');
-nonTaxableAllowances.forEach(function(input) {
-input.addEventListener('input', calculateNonTaxableAllowancesTotal);
-});
-
-// Handle insurance dropdown
-if (insuranceDropdown) {
-insuranceDropdown.addEventListener('change', function() {
-    const customPremiumSection = document.getElementById('custom-premium-section');
-
-    if (this.value === 'custom') {
-        customPremiumSection.classList.remove('d-none');
-    } else {
-        customPremiumSection.classList.add('d-none');
-        document.getElementById('custom-premium').value = '';
-    }
-});
-}
-
-// Create income breakdown chart
-function createIncomeChart(basicSalary, taxableAllowances, nonTaxableAllowances, gratuity) {
-const ctx = document.getElementById('income-chart')?.getContext('2d');
-if (!ctx) return;
-
-// Destroy existing chart if it exists
-if (incomeChart) {
-    incomeChart.destroy();
-}
-
-incomeChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-        labels: ['Basic Salary', 'Taxable Allowances', 'Non-Taxable Allowances', 'Gratuity'],
-        datasets: [{
-            data: [basicSalary, taxableAllowances, nonTaxableAllowances, gratuity],
-            backgroundColor: [
-                '#3b82f6', // Blue
-                '#ef4444', // Red
-                '#10b981', // Green
-                '#f59e0b'  // Amber
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom'
-            },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        const label = context.label || '';
-                        const value = context.raw || 0;
-                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                        const percentage = Math.round((value / total) * 100);
-                        return `${label}: ${formatCurrency(value)} (${percentage}%)`;
-                    }
-                }
-            }
-        }
-    }
-});
-}
-
-// Create tax bracket visualization
-function createTaxChart(taxableIncome, incomeTax) {
-const ctx = document.getElementById('tax-chart')?.getContext('2d');
-if (!ctx) return;
-
-// Destroy existing chart if it exists
-if (taxChart) {
-    taxChart.destroy();
-}
-
-// Calculate tax breakdown
-let taxAt25Percent = Math.min(taxableIncome, TAX_THRESHOLD) * TAX_RATE_1;
-let taxAt35Percent = taxableIncome > TAX_THRESHOLD ? 
-                    (taxableIncome - TAX_THRESHOLD) * TAX_RATE_2 : 0;
-
-                    taxChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Taxable Income', 'Income Tax'],
-                            datasets: [
-                                {
-                                    label: '25% Tax Bracket',
-                                    data: [Math.min(taxableIncome, TAX_THRESHOLD), taxAt25Percent],
-                                    backgroundColor: '#3b82f6',
-                                    borderColor: '#2563eb',
-                                    borderWidth: 1
-                                },
-                                {
-                                    label: '35% Tax Bracket',
-                                    data: [taxableIncome > TAX_THRESHOLD ? taxableIncome - TAX_THRESHOLD : 0, taxAt35Percent],
-                                    backgroundColor: '#ef4444',
-                                    borderColor: '#dc2626',
-                                    borderWidth: 1
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                x: {
-                                    stacked: true
-                                },
-                                y: {
-                                    stacked: true,
-                                    ticks: {
-                                        callback: function(value) {
-                                            return '$' + value.toLocaleString();
-                                        }
-                                    }
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    position: 'bottom'
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            const label = context.dataset.label || '';
-                                            const value = context.raw || 0;
-                                            return `${label}: ${formatCurrency(value)}`;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
+    <!-- Bootstrap and other scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     
-                // Add direct click handling for calculation button
-                if (calculateBtn) {
-                    calculateBtn.addEventListener('click', function() {
-                        console.log('Calculate button direct click handler triggered');
-                        calculateSalary();
-                    });
-                    console.log('Direct event listener added to calculate button');
-                }
-                
-                function calculateSalary() {
-                    console.log("Calculate button clicked!");
-                    
-                    try {
-                        // Show loading overlay
-                        if (loadingOverlay) {
-                            loadingOverlay.style.display = 'flex';
-                        }
-                        
-                        // Get input values
-                        const basicSalary = parseFloat(document.getElementById('basic-salary').value) || 0;
-                        
-                        // Get allowances
-                        let taxableAllowances = 0;
-                        if (document.getElementById('single-taxable-allowance') && 
-                            document.getElementById('single-taxable-allowance').classList.contains('d-none')) {
-                            // Multiple allowances are showing
-                            document.querySelectorAll('.taxable-allowance').forEach(function(input) {
-                                taxableAllowances += parseFloat(input.value) || 0;
-                            });
-                        } else {
-                            // Single input is showing
-                            taxableAllowances = parseFloat(document.getElementById('taxable-allowances').value) || 0;
-                        }
-                        
-                        let nonTaxableAllowances = 0;
-                        if (document.getElementById('single-non-taxable-allowance') && 
-                            document.getElementById('single-non-taxable-allowance').classList.contains('d-none')) {
-                            // Multiple allowances are showing
-                            document.querySelectorAll('.non-taxable-allowance:not(#vacation-allowance)').forEach(function(input) {
-                                nonTaxableAllowances += parseFloat(input.value) || 0;
-                            });
-                        } else {
-                            // Single input is showing
-                            nonTaxableAllowances = parseFloat(document.getElementById('non-taxable-allowances').value) || 0;
-                        }
-                
-                        // Get vacation allowance (annual payment)
-                        const vacationAllowance = parseFloat(document.getElementById('vacation-allowance')?.value) || 0;
-                        
-                        // Get other income and deductions
-                        const overtimeIncome = parseFloat(document.getElementById('overtime').value) || 0;
-                        const secondJobIncome = parseFloat(document.getElementById('second-job').value) || 0;
-                        const childCount = parseInt(document.getElementById('children').value) || 0;
-                        const loanPayment = parseFloat(document.getElementById('loan-payment').value) || 0;
-                        const gpsuDeduction = parseFloat(document.getElementById('gpsu-deduction').value) || 0;
-                
-                        // Insurance premium
-                        let insurancePremium = 0;
-                        const insuranceType = document.getElementById('insurance').value;
-                        
-                        if (insuranceType === 'custom') {
-                            insurancePremium = parseFloat(document.getElementById('custom-premium').value) || 0;
-                        } else {
-                            insurancePremium = INSURANCE_PREMIUMS[insuranceType];
-                        }
-                
-                        // MONTHLY CALCULATIONS
-                        
-                        // Gratuity calculation - 22.5% of basic salary accrued monthly
-                        const gratuityRate = parseFloat(document.getElementById('gratuity-rate').value) || 22.5;
-                        
-                        // Monthly gratuity accrual (not paid monthly, but accrued)
-                        const monthlyGratuityAccrual = basicSalary * (gratuityRate / 100);
-                        
-                        // Six month accumulated gratuity (paid at the 6-month mark)
-                        const sixMonthGratuity = monthlyGratuityAccrual * 6;
-                
-                        // Regular monthly gross income (excluding gratuity and vacation)
-                        const regularMonthlyGrossIncome = basicSalary + taxableAllowances + nonTaxableAllowances + 
-                                                        overtimeIncome + secondJobIncome;
-                
-                        // Calculate monthly deductions
-                        const personalAllowance = Math.max(PERSONAL_ALLOWANCE, regularMonthlyGrossIncome / 3);
-                        const nisContribution = Math.min(regularMonthlyGrossIncome * NIS_RATE, NIS_CEILING * NIS_RATE);
-                        const childAllowance = childCount * CHILD_ALLOWANCE;
-                        const overtimeAllowance = Math.min(overtimeIncome, OVERTIME_ALLOWANCE_MAX);
-                        const secondJobAllowance = Math.min(secondJobIncome, SECOND_JOB_ALLOWANCE_MAX);
-                
-                        // Calculate taxable income (based on regular monthly income)
-                        const taxableIncome = Math.max(0, basicSalary + taxableAllowances - personalAllowance - 
-                                                nisContribution - childAllowance - insurancePremium);
-                
-                        // Calculate income tax
-                        let incomeTax = 0;
-                        if (taxableIncome <= TAX_THRESHOLD) {
-                            incomeTax = taxableIncome * TAX_RATE_1;
-                        } else {
-                            incomeTax = (TAX_THRESHOLD * TAX_RATE_1) + 
-                                    ((taxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
-                        }
-                
-                        // Calculate regular monthly net salary (what you get each month)
-                        const monthlyNetSalary = regularMonthlyGrossIncome - nisContribution - incomeTax - loanPayment - gpsuDeduction;
-                
-                        // PACKAGE CALCULATIONS
-                        
-                        // For month 6 - net salary + gratuity
-                        const monthSixTotal = monthlyNetSalary + sixMonthGratuity;
-                        
-                        // For month 12 - net salary + gratuity + vacation allowance
-                        const monthTwelveTotal = monthlyNetSalary + sixMonthGratuity + vacationAllowance;
-                        
-                        // Annual Projections
-                        const annualGrossIncome = regularMonthlyGrossIncome * 12;
-                        const annualNisContribution = nisContribution * 12;
-                        const annualTaxPayable = incomeTax * 12;
-                        const annualGratuityTotal = sixMonthGratuity * 2; // Two gratuity payments per year
-                        
-                        // UPDATE UI
-                        // Regular monthly values
-                        document.getElementById('result-basic').textContent = formatCurrency(basicSalary);
-                        document.getElementById('result-taxable-allowances').textContent = formatCurrency(taxableAllowances);
-                        document.getElementById('result-non-taxable-allowances').textContent = formatCurrency(nonTaxableAllowances);
-                        document.getElementById('result-gross').textContent = formatCurrency(regularMonthlyGrossIncome);
-                        document.getElementById('result-personal-allowance').textContent = formatCurrency(personalAllowance);
-                        document.getElementById('result-nis').textContent = formatCurrency(nisContribution);
-                        document.getElementById('result-child').textContent = formatCurrency(childAllowance);
-                        document.getElementById('result-overtime').textContent = formatCurrency(overtimeAllowance);
-                        document.getElementById('result-second-job').textContent = formatCurrency(secondJobAllowance);
-                        document.getElementById('result-insurance').textContent = formatCurrency(insurancePremium);
-                        document.getElementById('result-loan-deductions').textContent = formatCurrency(loanPayment);
-                        document.getElementById('result-gpsu-deduction').textContent = formatCurrency(gpsuDeduction);
-                        document.getElementById('result-taxable-income').textContent = formatCurrency(taxableIncome);
-                        document.getElementById('result-tax').textContent = formatCurrency(incomeTax);
-                        document.getElementById('result-monthly-gratuity').textContent = formatCurrency(monthlyGratuityAccrual);
-                        document.getElementById('result-net').textContent = formatCurrency(monthlyNetSalary);
-                
-                        // Annual projections
-                        document.getElementById('result-annual-gross').textContent = formatCurrency(annualGrossIncome);
-                        document.getElementById('result-annual-nis').textContent = formatCurrency(annualNisContribution);
-                        document.getElementById('result-annual-tax').textContent = formatCurrency(annualTaxPayable);
-                        document.getElementById('result-annual-gratuity').textContent = formatCurrency(annualGratuityTotal);
-                        document.getElementById('result-annual-net').textContent = formatCurrency(monthlyNetSalary * 12 + annualGratuityTotal + vacationAllowance);
-                
-                        // Package breakdown - Month 6 (what you actually get in month 6)
-                        document.getElementById('result-month-six-net').textContent = formatCurrency(monthlyNetSalary);
-                        document.getElementById('result-month-six-gratuity').textContent = formatCurrency(sixMonthGratuity);
-                        document.getElementById('result-month-six-total').textContent = formatCurrency(monthSixTotal);
-                        
-                        // Package breakdown - Month 12 (what you actually get in month 12)
-                        document.getElementById('result-month-twelve-net').textContent = formatCurrency(monthlyNetSalary);
-                        document.getElementById('result-month-twelve-gratuity').textContent = formatCurrency(sixMonthGratuity);
-                        document.getElementById('result-month-twelve-vacation').textContent = formatCurrency(vacationAllowance);
-                        document.getElementById('result-month-twelve-total').textContent = formatCurrency(monthTwelveTotal);
-                
-                        // Show/hide second job row
-                        const secondJobResultRow = document.getElementById('second-job-result-row');
-                        if (secondJobIncome > 0 || 
-                            (document.getElementById('second-job-section') && 
-                             !document.getElementById('second-job-section').classList.contains('d-none'))) {
-                            secondJobResultRow.classList.remove('d-none');
-                        } else {
-                            secondJobResultRow.classList.add('d-none');
-                        }
-                        
-                        // Create charts
-                        createIncomeChart(basicSalary, taxableAllowances, nonTaxableAllowances, 0); // Gratuity not included in monthly chart
-                        createTaxChart(taxableIncome, incomeTax);
-                        
-                        // Scroll to results on mobile
-                        if (window.innerWidth < 992) {
-                            const resultsSection = document.querySelector('.results-section');
-                            if (resultsSection) {
-                                resultsSection.scrollIntoView({ behavior: 'smooth' });
-                            }
-                        }
-                        
-                    } catch (error) {
-                        console.error("Calculation error:", error);
-                        alert("There was an error in the calculation. Please check your inputs and try again.");
-                    } finally {
-                        // Hide loading overlay
-                        if (loadingOverlay) {
-                            loadingOverlay.style.display = 'none';
-                        }
-                    }
-                }
-            });
-        </script>
-        
-        <!-- Replace the testing script at the bottom of your HTML file with this version -->
-<script>
-    // Verification script without alerts
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Additional DOM loading check complete');
-        
-        const calculateBtn = document.getElementById('calculate-btn');
-        if (calculateBtn) {
-            console.log('Calculate button found in verification script');
-            
-            // Add a backup click handler if all else fails - WITHOUT ALERT
-            calculateBtn.onclick = function() {
-                console.log('Calculate button clicked via onclick property');
-                // Removed the alert that was here
-                
-                // Get basic salary
-                const basicSalary = parseFloat(document.getElementById('basic-salary').value) || 0;
-                console.log('Basic salary:', basicSalary);
-                
-                // Let the normal calculation function handle everything
-                // No need to manually update anything here
-            };
-        } else {
-            console.error('Calculate button not found in verification script');
-        }
-    });
-</script>
-    </body>
-    </html>
+    <!-- Application Scripts -->
+    <script src="js/constants.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/ui-handlers.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
