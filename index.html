@@ -66,8 +66,17 @@
                                 <input type="text" class="form-control" id="employee-name" placeholder="Enter full name">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="position" class="form-label">Position</label>
-                                <input type="text" class="form-control" id="position" placeholder="Enter job title">
+                                <label for="position-select" class="form-label">Position</label>
+                                <select id="position-select" class="form-select">
+                                    <option value="other" selected>Other (Type custom position)</option>
+                                    <option value="ict-tech-1">ICT Technician I</option>
+                                    <option value="ict-tech-2">ICT Technician II</option>
+                                    <option value="ict-tech-3">ICT Technician III</option>
+                                    <option value="assist-ict-eng-3">Assistant ICT Engineer III</option>
+                                    <option value="ict-eng-3">ICT Engineer III</option>
+                                </select>
+                                <!-- Hidden input that shows when "Other" is selected -->
+                                <input type="text" class="form-control mt-2" id="position-custom" placeholder="Enter custom position">
                             </div>
                         </div>
                         
@@ -102,35 +111,6 @@
                                 <input type="date" class="form-control" id="calculation-date">
                                 <div class="form-text">Date for salary calculation (today or future date)</div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Position Presets Card -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0">
-                            <i class="fas fa-briefcase"></i> Position Presets
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-3 small">Quickly set salary and allowances based on ICT job positions:</p>
-                        <div class="preset-container d-flex flex-wrap gap-2">
-                            <button class="btn btn-outline-primary position-preset" data-position="ict-tech-1">
-                                ICT Technician I
-                            </button>
-                            <button class="btn btn-outline-primary position-preset" data-position="ict-tech-2">
-                                ICT Technician II
-                            </button>
-                            <button class="btn btn-outline-primary position-preset" data-position="ict-tech-3">
-                                ICT Technician III
-                            </button>
-                            <button class="btn btn-outline-primary position-preset" data-position="assist-ict-eng-3">
-                                Assistant ICT Engineer III
-                            </button>
-                            <button class="btn btn-outline-primary position-preset" data-position="ict-eng-3">
-                                ICT Engineer III
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -540,7 +520,7 @@
                                 <label for="gratuity-rate" class="form-label">
                                     Gratuity Rate (%)
                                     <i class="fas fa-question-circle info-tooltip" 
-                                       data-bs-toggle="tooltip"
+                                       data-bs-toggle="tooltip" 
                                        title="Standard gratuity rate is 22.5% of basic salary per month."></i>
                                 </label>
                                 <input type="number" class="form-control" id="gratuity-rate" value="22.5" step="0.1">

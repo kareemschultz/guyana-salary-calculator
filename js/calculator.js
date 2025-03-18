@@ -35,6 +35,9 @@ function calculateSalary() {
  * @returns {Object} All input values
  */
 function getInputValues() {
+    // Get position from dropdown or custom input
+    const position = getSelectedPosition();
+    
     // Basic salary
     const basicSalary = parseFloat(document.getElementById('basic-salary').value) || 0;
     
@@ -89,6 +92,7 @@ function getInputValues() {
     const gratuityPeriod = parseInt(document.getElementById('gratuity-period').value) || 6;
 
     return {
+        position,
         basicSalary,
         taxableAllowances,
         nonTaxableAllowances,

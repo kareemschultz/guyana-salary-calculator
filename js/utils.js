@@ -164,8 +164,8 @@ function applyPositionPreset(presetId) {
     const preset = POSITION_PRESETS[presetId];
     debug('Applying position preset', preset);
     
+    // We don't need to set the position anymore as the dropdown handles it
     // Set job title and salary
-    document.getElementById('position').value = preset.title;
     document.getElementById('basic-salary').value = preset.baseSalary;
     
     // Calculate gross salary for vacation allowance

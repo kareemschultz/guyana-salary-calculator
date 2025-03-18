@@ -8,6 +8,9 @@
 function setupEventListeners() {
     debug('Setting up event listeners');
     
+    // Setup position dropdown
+    setupPositionDropdown();
+    
     // Calculate button
     const calculateBtn = document.getElementById('calculate-btn');
     if (calculateBtn) {
@@ -134,21 +137,6 @@ function setupEventListeners() {
         });
     }
     
-    // Position preset buttons
-    const positionPresets = document.querySelectorAll('.position-preset');
-    positionPresets.forEach(function(button) {
-        button.addEventListener('click', function() {
-            const presetId = this.getAttribute('data-position');
-            applyPositionPreset(presetId);
-            
-            // Highlight the selected button
-            positionPresets.forEach(btn => btn.classList.remove('btn-primary'));
-            positionPresets.forEach(btn => btn.classList.add('btn-outline-primary'));
-            this.classList.remove('btn-outline-primary');
-            this.classList.add('btn-primary');
-        });
-    });
-
     // Initialize tooltips
     initializeTooltips();
 }
@@ -285,5 +273,57 @@ function updateResultsDisplay(results) {
         if (resultsSection) {
             resultsSection.scrollIntoView({ behavior: 'smooth' });
         }
+    }
+}
+
+/**
+ * Handle position dropdown selection
+ */
+function setupPositionDropdown() {
+    const positionSelect = document.getElementById('position-select');
+    const positionCustom = document.getElementById('position-custom');
+    
+    // Initial state - if "Other" is selected, show custom input
+    if (positionSelect && positionCustom) {
+        if (positionSelect.value === 'other') {
+            positionCustom.style.display = 'block';
+        } else {
+            positionCustom.style.display = 'none';
+        }
+        
+        // Add event listener for dropdown changes
+        positionSelect.addEventListener('change', function() {
+            if (this.value === 'other') {
+                // Show custom input field
+                positionCustom.style.display = 'block';
+                positionCustom.focus();
+            } else {
+                // Hide custom input and apply position preset
+                positionCustom.style.display = 'none';
+                applyPositionPreset(this.value);
+            }
+        });
+    }
+}
+
+/**
+ * Update the position function to work with the dropdown
+ * This function gets the displayed position text (either custom or selected)
+ */
+function getSelectedPosition() {
+    const positionSelect = document.getElementById('position-select');
+    const positionCustom = document.getElementById('position-custom');
+    
+    if (!positionSelect || !positionCustom) {
+        // Fallback to old position field if the dropdown isn't found
+        const oldPositionField = document.getElementById('position');
+        return oldPositionField ? oldPositionField.value : '';
+    }
+    
+    if (positionSelect.value === 'other') {
+        return positionCustom.value;
+    } else {
+        // Get the text of the selected option
+        return positionSelect.options[positionSelect.selectedIndex].text;
     }
 }
