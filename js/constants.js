@@ -39,9 +39,8 @@ const POSITION_PRESETS = {
             travel: 0,
             telecom: 0
         },
-        // Vacation allowance is calculated dynamically as gross salary
-        totalTaxableAllowances: 20000, // Sum of all taxable allowances
-        totalNonTaxableAllowances: 0    // Sum of all non-taxable allowances (excluding vacation)
+        totalTaxableAllowances: 20000,
+        totalNonTaxableAllowances: 0
     },
     'ict-tech-2': {
         title: 'ICT Technician II',
@@ -99,4 +98,12 @@ const POSITION_PRESETS = {
         totalTaxableAllowances: 85000,
         totalNonTaxableAllowances: 15000
     }
+};
+
+// Qualification allowances (starting January 2025)
+const QUALIFICATION_ALLOWANCES = {
+    'none': 0,
+    'acca': 15000,    // ACCA Qualification
+    'masters': 22000, // Master's Degree
+    'phd': 32000      // Doctoral Degree
 };

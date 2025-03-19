@@ -357,7 +357,68 @@
                                 </div>
                             </div>
                         </div>
-                        
+                        <!-- Qualification Allowances Section -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0">
+                                        <span class="allowance-badge non-taxable me-2">Non-Taxable</span> Qualification Allowances
+                                        <i class="fas fa-question-circle info-tooltip" 
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-html="true"
+                                        title="<b>Qualification Allowances:</b><br>• ACCA Qualification: $15,000 monthly<br>• Master's Degree: $22,000 monthly<br>• Doctoral Degree: $32,000 monthly<br><br>These allowances were announced by President Dr. Irfaan Ali and will be effective from January 2025."></i>
+                                    </h6>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Do you have any of these qualifications?</label>
+                                    <div class="row mb-2">
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input qualification-check" type="radio" name="qualification-type" id="qualification-none" value="none" checked>
+                                                <label class="form-check-label" for="qualification-none">
+                                                    No Eligible Qualification
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input qualification-check" type="radio" name="qualification-type" id="qualification-acca" value="acca">
+                                                <label class="form-check-label" for="qualification-acca">
+                                                    ACCA Qualification
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input qualification-check" type="radio" name="qualification-type" id="qualification-masters" value="masters">
+                                                <label class="form-check-label" for="qualification-masters">
+                                                    Master's Degree
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input qualification-check" type="radio" name="qualification-type" id="qualification-phd" value="phd">
+                                                <label class="form-check-label" for="qualification-phd">
+                                                    Doctoral Degree (PhD)
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-success qualification-alert d-none" role="alert">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-graduation-cap me-2"></i>
+                                        <div>
+                                            <strong>Qualification Allowance Applied:</strong> 
+                                            <span id="qualification-allowance-amount">$0</span> monthly
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         <!-- Overtime Income -->
                         <div class="mb-3">
                             <label for="overtime" class="form-label">

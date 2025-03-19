@@ -73,6 +73,13 @@ function getInputValues() {
     // Get vacation allowance (annual payment)
     const vacationAllowance = parseFloat(document.getElementById('vacation-allowance')?.value) || 0;
     
+    // Get qualification allowance
+    const qualificationType = document.querySelector('input[name="qualification-type"]:checked').value;
+    const qualificationAllowance = QUALIFICATION_ALLOWANCES[qualificationType];
+    
+    // Add qualification allowance to non-taxable allowances
+    nonTaxableAllowances += qualificationAllowance;
+    
     // Get other income and deductions
     const overtimeIncome = parseFloat(document.getElementById('overtime').value) || 0;
     const secondJobIncome = parseFloat(document.getElementById('second-job').value) || 0;
@@ -100,6 +107,8 @@ function getInputValues() {
         taxableAllowances,
         nonTaxableAllowances,
         vacationAllowance,
+        qualificationType,
+        qualificationAllowance,
         overtimeIncome,
         secondJobIncome,
         childCount,
@@ -123,6 +132,7 @@ function performCalculations(inputs) {
         taxableAllowances,
         nonTaxableAllowances,
         vacationAllowance,
+        qualificationAllowance,
         overtimeIncome,
         secondJobIncome,
         childCount,
@@ -189,6 +199,7 @@ function performCalculations(inputs) {
         taxableAllowances,
         nonTaxableAllowances,
         vacationAllowance,
+        qualificationAllowance,
         overtimeIncome,
         secondJobIncome,
         childCount,

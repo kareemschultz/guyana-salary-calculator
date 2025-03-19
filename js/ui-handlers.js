@@ -11,6 +11,9 @@ function setupEventListeners() {
     // Setup position dropdown
     setupPositionDropdown();
     
+    // Setup qualification allowance listeners
+    setupQualificationListeners();
+    
     // Calculate button
     const calculateBtn = document.getElementById('calculate-btn');
     if (calculateBtn) {
@@ -154,6 +157,34 @@ function setupEventListeners() {
 }
 
 /**
+ * Update the qualification allowance based on selection
+ */
+function updateQualificationAllowance() {
+    const selectedQualification = document.querySelector('input[name="qualification-type"]:checked').value;
+    const allowanceAmount = QUALIFICATION_ALLOWANCES[selectedQualification];
+    
+    const qualificationAlert = document.querySelector('.qualification-alert');
+    const allowanceAmountElement = document.getElementById('qualification-allowance-amount');
+    
+    if (selectedQualification === 'none') {
+        qualificationAlert.classList.add('d-none');
+    } else {
+        qualificationAlert.classList.remove('d-none');
+        allowanceAmountElement.textContent = formatCurrency(allowanceAmount);
+    }
+}
+
+/**
+ * Set up event listeners for qualification checkboxes
+ */
+function setupQualificationListeners() {
+    const qualificationChecks = document.querySelectorAll('.qualification-check');
+    qualificationChecks.forEach(check => {
+        check.addEventListener('change', updateQualificationAllowance);
+    });
+}
+
+/**
  * Initialize Bootstrap tooltips
  */
 function initializeTooltips() {
@@ -229,6 +260,11 @@ function updateResultsDisplay(results) {
     document.getElementById('result-tax').textContent = formatCurrency(results.incomeTax);
     document.getElementById('result-monthly-gratuity').textContent = formatCurrency(results.monthlyGratuityAccrual);
     document.getElementById('result-net').textContent = formatCurrency(results.monthlyNetSalary);
+
+    // If you added the qualification allowance row to the results display
+    if (document.getElementById('result-qualification-allowance')) {
+        document.getElementById('result-qualification-allowance').textContent = formatCurrency(results.qualificationAllowance);
+    }
 
     // Annual projections
     document.getElementById('result-annual-gross').textContent = formatCurrency(results.annualGrossIncome);
