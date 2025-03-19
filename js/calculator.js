@@ -18,6 +18,9 @@ function calculateSalary() {
         // Perform calculations
         const results = performCalculations(inputValues);
         
+        // Store results for comparison with salary increase
+        storeCurrentResults(results);
+        
         // Update the UI with results
         updateResultsDisplay(results);
         

@@ -17,6 +17,18 @@ function setupEventListeners() {
         calculateBtn.addEventListener('click', function() {
             debug('Calculate button clicked');
             calculateSalary();
+            
+            // Show the salary increase section after calculation
+            showSalaryIncreaseSection();
+        });
+    }
+    
+    // Calculate with increase button
+    const calculateIncreaseBtn = document.getElementById('calculate-increase-btn');
+    if (calculateIncreaseBtn) {
+        calculateIncreaseBtn.addEventListener('click', function() {
+            debug('Calculate with increase button clicked');
+            calculateWithIncrease();
         });
     }
     
