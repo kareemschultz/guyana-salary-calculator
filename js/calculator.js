@@ -161,6 +161,7 @@ function performCalculations(inputs) {
     const secondJobAllowance = Math.min(secondJobIncome, SECOND_JOB_ALLOWANCE_MAX);
 
     // CORRECTED: Calculate taxable income - GPSU is NOT tax deductible (credit union payment)
+    // Per GRA 2025 rules: Only Personal Allowance, NIS, Child Allowance, and Insurance are tax deductible
     const taxableIncome = Math.max(0, basicSalary + taxableAllowances - personalAllowance - 
                             nisContribution - childAllowance - insurancePremium);
 
@@ -173,7 +174,9 @@ function performCalculations(inputs) {
                 ((taxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
     }
 
-    // Calculate regular monthly net salary (what you get each month)
+    // CORRECTED: Calculate regular monthly net salary
+    // Insurance premium is already deducted as tax deduction, not as separate payment
+    // GPSU and loan payments are deducted from net pay
     const monthlyNetSalary = regularMonthlyGrossIncome - nisContribution - incomeTax - loanPayment - gpsuDeduction;
 
     // PACKAGE CALCULATIONS
