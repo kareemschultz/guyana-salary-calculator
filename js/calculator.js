@@ -160,9 +160,9 @@ function performCalculations(inputs) {
     const overtimeAllowance = Math.min(overtimeIncome, OVERTIME_ALLOWANCE_MAX);
     const secondJobAllowance = Math.min(secondJobIncome, SECOND_JOB_ALLOWANCE_MAX);
 
-    // FIXED: Calculate taxable income with ALL deductions including GPSU
+    // CORRECTED: Calculate taxable income - GPSU is NOT tax deductible (credit union payment)
     const taxableIncome = Math.max(0, basicSalary + taxableAllowances - personalAllowance - 
-                            nisContribution - childAllowance - insurancePremium - gpsuDeduction);
+                            nisContribution - childAllowance - insurancePremium);
 
     // Calculate income tax
     let incomeTax = 0;
