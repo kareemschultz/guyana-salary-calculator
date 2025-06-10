@@ -90,7 +90,7 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
         newResults.personalAllowance = Math.max(PERSONAL_ALLOWANCE, newResults.regularMonthlyGrossIncome / 3);
         newResults.nisContribution = Math.min(newResults.regularMonthlyGrossIncome * NIS_RATE, NIS_CEILING * NIS_RATE);
         
-        // Recalculate taxable income - include qualification allowance as non-taxable
+        // CORRECTED: Recalculate taxable income WITHOUT GPSU deduction (credit union payment)
         newResults.taxableIncome = Math.max(0, newResults.basicSalary + newResults.taxableAllowances - 
                                      newResults.personalAllowance - newResults.nisContribution - 
                                      newResults.childAllowance - newResults.insurancePremium);
@@ -108,7 +108,7 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
         // The taxable income and tax calculations stay the same
     }
     
-    // Recalculate net salary - ensure qualification allowance is included
+    // CORRECTED: Recalculate net salary - GPSU is deducted from net pay (not tax deductible)
     newResults.monthlyNetSalary = newResults.regularMonthlyGrossIncome - 
                                   newResults.nisContribution - 
                                   newResults.incomeTax - 
