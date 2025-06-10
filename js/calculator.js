@@ -160,9 +160,9 @@ function performCalculations(inputs) {
     const overtimeAllowance = Math.min(overtimeIncome, OVERTIME_ALLOWANCE_MAX);
     const secondJobAllowance = Math.min(secondJobIncome, SECOND_JOB_ALLOWANCE_MAX);
 
-    // Calculate taxable income (based on regular monthly income)
+    // FIXED: Calculate taxable income with ALL deductions including GPSU
     const taxableIncome = Math.max(0, basicSalary + taxableAllowances - personalAllowance - 
-                            nisContribution - childAllowance - insurancePremium);
+                            nisContribution - childAllowance - insurancePremium - gpsuDeduction);
 
     // Calculate income tax
     let incomeTax = 0;
