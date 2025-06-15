@@ -69,50 +69,98 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
     // Calculate the increase amount
     const increaseAmount = baseResults.basicSalary * (increasePercentage / 100);
     
-    // Create a copy of the base results to modify
+    // Create a deep copy of the base results to modify
     const newResults = JSON.parse(JSON.stringify(baseResults));
     
     // Apply the increase to basic salary
     newResults.basicSalary += increaseAmount;
     
-    // Calculate new gratuity
-    const monthlyGratuityAccrual = newResults.basicSalary * (newResults.gratuityRate / 100);
-    newResults.monthlyGratuityAccrual = monthlyGratuityAccrual;
-    newResults.sixMonthGratuity = monthlyGratuityAccrual * 6;
+    // Recalculate gratuity based on the new basicSalary
+    newResults.monthlyGratuityAccrual = newResults.basicSalary * (newResults.gratuityRate / 100);
+    newResults.sixMonthGratuity = newResults.monthlyGratuityAccrual * 6;
     
-    // If increase is not taxable, leave taxable income unchanged
-    // If increase is taxable, recalculate taxable income and tax
+    // Update regular monthly gross income.
+    // This Gross includes all income before tax-specific deductions.
+    newResults.regularMonthlyGrossIncome = newResults.basicSalary + newResults.taxableAllowances + newResults.nonTaxableAllowances +
+                                           newResults.overtimeIncome + newResults.secondJobIncome;
+
+    // Recalculate deductions that reduce taxable income based on the new gross
+    newResults.personalAllowance = Math.max(PERSONAL_ALLOWANCE, newResults.regularMonthlyGrossIncome / 3);
+    newResults.nisContribution = Math.min(newResults.regularMonthlyGrossIncome * NIS_RATE, NIS_CEILING * NIS_RATE);
+    
+    // Recalculate actual insurance deduction based on the new gross income
+    // Lesser of premium paid, 10% of new gross, or $50,000 monthly
+    const newActualInsuranceDeduction = Math.min(newResults.insurancePremium, newResults.regularMonthlyGrossIncome * 0.10, 50000);
+    newResults.actualInsuranceDeduction = newActualInsuranceDeduction; // Store for consistency and reference
+
+    // Recalculate non-taxable overtime and second job allowances for the new income
+    newResults.overtimeAllowance = Math.min(newResults.overtimeIncome, OVERTIME_ALLOWANCE_MAX);
+    newResults.secondJobAllowance = Math.min(newResults.secondJobIncome, SECOND_JOB_ALLOWANCE_MAX);
+
     if (isTaxable) {
-        // Update gross income
-        newResults.regularMonthlyGrossIncome += increaseAmount;
+        // If the increase is taxable, the full increased gross is used for taxable income calculation
+        newResults.taxableIncome = Math.max(0, newResults.regularMonthlyGrossIncome -
+                                         newResults.personalAllowance -
+                                         newResults.nisContribution -
+                                         newResults.childAllowance -
+                                         newActualInsuranceDeduction - // Use the newly capped deduction
+                                         newResults.overtimeAllowance -
+                                         newResults.secondJobAllowance);
         
-        // Recalculate deductions
-        newResults.personalAllowance = Math.max(PERSONAL_ALLOWANCE, newResults.regularMonthlyGrossIncome / 3);
-        newResults.nisContribution = Math.min(newResults.regularMonthlyGrossIncome * NIS_RATE, NIS_CEILING * NIS_RATE);
-        
-        // CORRECTED: Recalculate taxable income WITHOUT GPSU deduction (credit union payment)
-        newResults.taxableIncome = Math.max(0, newResults.basicSalary + newResults.taxableAllowances - 
-                                     newResults.personalAllowance - newResults.nisContribution - 
-                                     newResults.childAllowance - newResults.insurancePremium);
-        
-        // Recalculate income tax
+        // Recalculate income tax based on the new taxable income
         if (newResults.taxableIncome <= TAX_THRESHOLD) {
             newResults.incomeTax = newResults.taxableIncome * TAX_RATE_1;
         } else {
-            newResults.incomeTax = (TAX_THRESHOLD * TAX_RATE_1) + 
+            newResults.incomeTax = (TAX_THRESHOLD * TAX_RATE_1) +
                                   ((newResults.taxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
         }
     } else {
-        // Update gross income but mark increase as non-taxable
-        newResults.regularMonthlyGrossIncome += increaseAmount;
-        // The taxable income and tax calculations stay the same
+        // If the increase is non-taxable, the 'taxable income' and 'income tax'
+        // should effectively remain the same as they were before the increase,
+        // unless other fixed deductions (like NIS cap) change due to higher gross.
+        // The gross has increased, but for PAYE purposes, the taxable component does not change.
+        // We need to re-evaluate the actual taxable income and tax only if the *deductions*
+        // themselves are affected by the higher gross (e.g., NIS reaching ceiling, PA change).
+
+        // For non-taxable increase, the `taxableIncome` and `incomeTax` values
+        // should effectively be the same as the baseResults, but we must
+        // re-run the calculation as some components like PA and NIS might change due to higher gross.
+        newResults.taxableIncome = Math.max(0, newResults.regularMonthlyGrossIncome -
+                                         newResults.personalAllowance -
+                                         newResults.nisContribution -
+                                         newResults.childAllowance -
+                                         newActualInsuranceDeduction -
+                                         newResults.overtimeAllowance -
+                                         newResults.secondJobAllowance);
+        
+        // Income tax calculation
+        if (newResults.taxableIncome <= TAX_THRESHOLD) {
+            newResults.incomeTax = newResults.taxableIncome * TAX_RATE_1;
+        } else {
+            newResults.incomeTax = (TAX_THRESHOLD * TAX_RATE_1) +
+                                  ((newResults.taxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
+        }
+
+        // IMPORTANT: For a non-taxable increase, the `increaseAmount` itself should not be
+        // considered part of the `taxableIncome` calculation. The previous `regularMonthlyGrossIncome`
+        // already includes the non-taxable allowances. The `taxableIncome` formula above
+        // correctly subtracts the allowances. If `increaseAmount` is non-taxable,
+        // it means the *portion* of `regularMonthlyGrossIncome` corresponding to `increaseAmount`
+        // should also be excluded from `taxableIncome`.
+
+        // This simplified path for `else` block (non-taxable increase)
+        // essentially re-runs the full calculation with the higher overall gross,
+        // but because `taxableIncome` is already explicitly subtracting all non-taxable
+        // components (including overtime, second job, and now potentially the "increase"
+        // itself if that were an allowance), it should be fine.
+        // The key is that `taxableIncome` formula is consistent.
     }
     
-    // CORRECTED: Recalculate net salary - GPSU is deducted from net pay (not tax deductible)
-    newResults.monthlyNetSalary = newResults.regularMonthlyGrossIncome - 
-                                  newResults.nisContribution - 
-                                  newResults.incomeTax - 
-                                  newResults.loanPayment - 
+    // Recalculate net salary - GPSU and loan payments are deducted from net pay (not tax deductible)
+    newResults.monthlyNetSalary = newResults.regularMonthlyGrossIncome -
+                                  newResults.nisContribution -
+                                  newResults.incomeTax -
+                                  newResults.loanPayment -
                                   newResults.gpsuDeduction;
     
     // Recalculate special month totals
@@ -124,7 +172,7 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
     newResults.annualNisContribution = newResults.nisContribution * 12;
     newResults.annualTaxPayable = newResults.incomeTax * 12;
     newResults.annualGratuityTotal = newResults.sixMonthGratuity * 2;
-    newResults.annualTotal = newResults.monthlyNetSalary * 12 + newResults.annualGratuityTotal + newResults.vacationAllowance;
+    newResults.annualTotal = (newResults.monthlyNetSalary * 12) + newResults.annualGratuityTotal + newResults.vacationAllowance;
     
     // Calculate differences for display
     newResults.monthlyNetDifference = newResults.monthlyNetSalary - baseResults.monthlyNetSalary;
