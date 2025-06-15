@@ -147,11 +147,12 @@ function performCalculations(inputs) {
 
     // Calculate monthly gratuity accrual (not paid monthly, but accrued)
     const monthlyGratuityAccrual = basicSalary * (gratuityRate / 100);
-
+    
     // Six month accumulated gratuity (paid at the 6-month mark)
     const sixMonthGratuity = monthlyGratuityAccrual * 6;
-
-    // Calculate regular monthly gross income (excluding annual gratuity lump sums and vacation lump sum)
+    
+    // Calculate regular monthly gross income for personal allowance and NIS calculation
+    // This gross includes all income before tax-specific deductions
     const regularMonthlyGrossIncome = basicSalary + taxableAllowances + nonTaxableAllowances +
                                     overtimeIncome + secondJobIncome;
 
@@ -159,25 +160,26 @@ function performCalculations(inputs) {
     // Deduction is lesser of premiums paid, 10% of gross income, or $50,000 monthly
     const actualInsuranceDeduction = Math.min(insurancePremium, regularMonthlyGrossIncome * 0.10, 50000);
 
-    // Calculate deductions
+    // Calculate deductions that reduce taxable income
     // Personal Allowance: Greater of $130,000 or 1/3 of gross income
     const personalAllowance = Math.max(PERSONAL_ALLOWANCE, regularMonthlyGrossIncome / 3);
     // NIS Contribution: 5.6% of gross income up to $280,000 monthly ceiling
     const nisContribution = Math.min(regularMonthlyGrossIncome * NIS_RATE, NIS_CEILING * NIS_RATE);
     // Child Allowance: $10,000 per child per month
     const childAllowance = childCount * CHILD_ALLOWANCE;
-    // Overtime Allowance: Lesser of actual overtime or $50,000 monthly
+    // Overtime Allowance (non-taxable portion): Lesser of actual overtime or $50,000 monthly
     const overtimeAllowance = Math.min(overtimeIncome, OVERTIME_ALLOWANCE_MAX);
-    // Second Job Allowance: Lesser of actual second job income or $50,000 monthly
+    // Second Job Allowance (non-taxable portion): Lesser of actual second job income or $50,000 monthly
     const secondJobAllowance = Math.min(secondJobIncome, SECOND_JOB_ALLOWANCE_MAX);
 
 
-    // Calculate taxable income
-    // Only Personal Allowance, NIS, Child Allowance, and Insurance are tax deductible from gross
+    // Calculate taxable income (Chargeable Income)
+    // Deduct all statutory allowances/deductions from the regular gross income
     const taxableIncome = Math.max(0, regularMonthlyGrossIncome - personalAllowance -
-                            nisContribution - childAllowance - actualInsuranceDeduction);
+                            nisContribution - childAllowance - actualInsuranceDeduction -
+                            overtimeAllowance - secondJobAllowance); // Subtracted non-taxable portions
 
-    // Calculate income tax
+    // Calculate income tax (PAYE)
     let incomeTax = 0;
     if (taxableIncome <= TAX_THRESHOLD) { // First $260,000 monthly ($3,120,000 annually) at 25%
         incomeTax = taxableIncome * TAX_RATE_1;
@@ -187,23 +189,23 @@ function performCalculations(inputs) {
     }
 
     // Calculate regular monthly net salary
-    // Loan payments and GPSU are deducted from net pay, not tax-deductible
+    // Loan payments and GPSU are deducted from net pay, as they are not tax-deductible
     const monthlyNetSalary = regularMonthlyGrossIncome - nisContribution - incomeTax - loanPayment - gpsuDeduction;
 
     // PACKAGE CALCULATIONS
-
+    
     // For month 6 - net salary + gratuity
     const monthSixTotal = monthlyNetSalary + sixMonthGratuity;
-
+    
     // For month 12 - net salary + gratuity + vacation allowance (annual lump sum)
     const monthTwelveTotal = monthlyNetSalary + sixMonthGratuity + vacationAllowance;
-
+    
     // Annual calculations
     const annualGrossIncome = regularMonthlyGrossIncome * 12;
     const annualNisContribution = nisContribution * 12;
     const annualTaxPayable = incomeTax * 12;
     const annualGratuityTotal = sixMonthGratuity * 2; // Two gratuity payments per year
-
+    
     // Total annual figure (including two gratuity payments and one annual vacation allowance)
     const annualTotal = (monthlyNetSalary * 12) + annualGratuityTotal + vacationAllowance;
 
@@ -222,7 +224,7 @@ function performCalculations(inputs) {
         insurancePremium, // Original premium input
         actualInsuranceDeduction, // The amount actually deducted for tax purposes
         gratuityRate,
-
+        
         // Monthly calculations
         regularMonthlyGrossIncome,
         personalAllowance,
@@ -234,12 +236,12 @@ function performCalculations(inputs) {
         incomeTax,
         monthlyNetSalary,
         monthlyGratuityAccrual,
-
+        
         // Special month calculations
         sixMonthGratuity,
         monthSixTotal,
         monthTwelveTotal,
-
+        
         // Annual calculations
         annualGrossIncome,
         annualNisContribution,
