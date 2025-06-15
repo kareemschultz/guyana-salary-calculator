@@ -118,13 +118,8 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
         // If the increase is non-taxable, the 'taxable income' and 'income tax'
         // should effectively remain the same as they were before the increase,
         // unless other fixed deductions (like NIS cap) change due to higher gross.
-        // The gross has increased, but for PAYE purposes, the taxable component does not change.
-        // We need to re-evaluate the actual taxable income and tax only if the *deductions*
-        // themselves are affected by the higher gross (e.g., NIS reaching ceiling, PA change).
-
-        // For non-taxable increase, the `taxableIncome` and `incomeTax` values
-        // should effectively be the same as the baseResults, but we must
-        // re-run the calculation as some components like PA and NIS might change due to higher gross.
+        // We re-run the calculation here to ensure components like PA and NIS are correctly
+        // recalculated based on the potentially higher overall gross.
         newResults.taxableIncome = Math.max(0, newResults.regularMonthlyGrossIncome -
                                          newResults.personalAllowance -
                                          newResults.nisContribution -
@@ -140,20 +135,6 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
             newResults.incomeTax = (TAX_THRESHOLD * TAX_RATE_1) +
                                   ((newResults.taxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
         }
-
-        // IMPORTANT: For a non-taxable increase, the `increaseAmount` itself should not be
-        // considered part of the `taxableIncome` calculation. The previous `regularMonthlyGrossIncome`
-        // already includes the non-taxable allowances. The `taxableIncome` formula above
-        // correctly subtracts the allowances. If `increaseAmount` is non-taxable,
-        // it means the *portion* of `regularMonthlyGrossIncome` corresponding to `increaseAmount`
-        // should also be excluded from `taxableIncome`.
-
-        // This simplified path for `else` block (non-taxable increase)
-        // essentially re-runs the full calculation with the higher overall gross,
-        // but because `taxableIncome` is already explicitly subtracting all non-taxable
-        // components (including overtime, second job, and now potentially the "increase"
-        // itself if that were an allowance), it should be fine.
-        // The key is that `taxableIncome` formula is consistent.
     }
     
     // Recalculate net salary - GPSU and loan payments are deducted from net pay (not tax deductible)
