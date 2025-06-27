@@ -10,6 +10,22 @@ function showSalaryIncreaseSection() {
     if (salaryIncreaseSection) {
         salaryIncreaseSection.classList.remove('d-none');
     }
+
+    // Setup listener for retroactive toggle
+    const toggleRetroactive = document.getElementById('toggle-retroactive');
+    if (toggleRetroactive) {
+        toggleRetroactive.addEventListener('change', function() {
+            const retroactiveSection = document.getElementById('retroactive-section');
+            const retroactiveResultsDisplay = document.getElementById('retroactive-results-display');
+            if (this.checked) {
+                retroactiveSection.classList.remove('d-none');
+                retroactiveResultsDisplay.classList.remove('d-none');
+            } else {
+                retroactiveSection.classList.add('d-none');
+                retroactiveResultsDisplay.classList.add('d-none');
+            }
+        });
+    }
 }
 
 /**
@@ -30,11 +46,15 @@ function calculateWithIncrease() {
         const increasePercentage = parseFloat(document.getElementById('increase-percentage').value) || 0;
         const isTaxable = document.querySelector('input[name="increase-taxable"]:checked').value === 'yes';
         
+        // Get retroactive parameters
+        const isRetroactive = document.getElementById('toggle-retroactive').checked;
+        const retroactiveMonths = isRetroactive ? (parseInt(document.getElementById('retroactive-months').value) || 0) : 0;
+
         // Calculate new values
-        const results = calculateIncreaseResults(lastResults, increasePercentage, isTaxable);
+        const results = calculateIncreaseResults(lastResults, increasePercentage, isTaxable, retroactiveMonths);
         
         // Display new results
-        updateIncreaseResultsDisplay(results, lastResults);
+        updateIncreaseResultsDisplay(results, lastResults, isRetroactive);
         
     } catch (error) {
         console.error("Increase calculation error:", error);
@@ -63,24 +83,24 @@ function getCurrentResults() {
  * @param {Object} baseResults - The base calculation results
  * @param {number} increasePercentage - The percentage increase
  * @param {boolean} isTaxable - Whether the increase is taxable
+ * @param {number} retroactiveMonths - Number of months for retroactive pay
  * @returns {Object} The new calculation results
  */
-function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
-    // Calculate the increase amount
-    const increaseAmount = baseResults.basicSalary * (increasePercentage / 100);
+function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, retroactiveMonths) {
+    // Calculate the increase amount based on baseResults.basicSalary
+    const monthlyBasicIncreaseAmount = baseResults.basicSalary * (increasePercentage / 100);
     
     // Create a deep copy of the base results to modify
     const newResults = JSON.parse(JSON.stringify(baseResults));
     
-    // Apply the increase to basic salary
-    newResults.basicSalary += increaseAmount;
+    // Apply the increase to basic salary for the new monthly salary
+    newResults.basicSalary += monthlyBasicIncreaseAmount;
     
     // Recalculate gratuity based on the new basicSalary
     newResults.monthlyGratuityAccrual = newResults.basicSalary * (newResults.gratuityRate / 100);
     newResults.sixMonthGratuity = newResults.monthlyGratuityAccrual * 6;
     
-    // Update regular monthly gross income.
-    // This Gross includes all income before tax-specific deductions.
+    // Update regular monthly gross income for the new monthly salary
     newResults.regularMonthlyGrossIncome = newResults.basicSalary + newResults.taxableAllowances + newResults.nonTaxableAllowances +
                                            newResults.overtimeIncome + newResults.secondJobIncome;
 
@@ -89,81 +109,90 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
     newResults.nisContribution = Math.min(newResults.regularMonthlyGrossIncome * NIS_RATE, NIS_CEILING * NIS_RATE);
     
     // Recalculate actual insurance deduction based on the new gross income
-    // Lesser of premium paid, 10% of new gross, or $50,000 monthly
     const newActualInsuranceDeduction = Math.min(newResults.insurancePremium, newResults.regularMonthlyGrossIncome * 0.10, 50000);
-    newResults.actualInsuranceDeduction = newActualInsuranceDeduction; // Store for consistency and reference
+    newResults.actualInsuranceDeduction = newActualInsuranceDeduction; 
 
     // Recalculate non-taxable overtime and second job allowances for the new income
     newResults.overtimeAllowance = Math.min(newResults.overtimeIncome, OVERTIME_ALLOWANCE_MAX);
     newResults.secondJobAllowance = Math.min(newResults.secondJobIncome, SECOND_JOB_ALLOWANCE_MAX);
 
-    if (isTaxable) {
-        // If the increase is taxable, the full increased gross is used for taxable income calculation
-        // Calculate the 'taxable portion of gross income'
-        const grossIncomeForTaxableCalculation = newResults.regularMonthlyGrossIncome - newResults.nonTaxableAllowances - newResults.overtimeAllowance - newResults.secondJobAllowance;
+    // Calculate the 'gross income for taxable calculation' for the new monthly salary
+    const grossIncomeForTaxableCalculation = newResults.regularMonthlyGrossIncome - newResults.nonTaxableAllowances - newResults.overtimeAllowance - newResults.secondJobAllowance;
 
-        newResults.taxableIncome = Math.max(0, grossIncomeForTaxableCalculation -
-                                         newResults.personalAllowance -
-                                         newResults.nisContribution -
-                                         newResults.childAllowance -
-                                         newActualInsuranceDeduction); // Use the newly capped deduction
-        
-        // Recalculate income tax based on the new taxable income
-        if (newResults.taxableIncome <= TAX_THRESHOLD) {
-            newResults.incomeTax = newResults.taxableIncome * TAX_RATE_1;
-        } else {
-            newResults.incomeTax = (TAX_THRESHOLD * TAX_RATE_1) +
-                                  ((newResults.taxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
-        }
-    } else {
-        // If the increase is non-taxable, the 'taxable income' and 'income tax'
-        // should effectively remain the same as they were before the increase,
-        // unless other fixed deductions (like NIS cap) change due to higher gross.
-        // We re-run the calculation here to ensure components like PA and NIS are correctly
-        // recalculated based on the potentially higher overall gross.
-
-        // Calculate the 'taxable portion of gross income'
-        const grossIncomeForTaxableCalculation = newResults.regularMonthlyGrossIncome - newResults.nonTaxableAllowances - newResults.overtimeAllowance - newResults.secondJobAllowance;
-
-        newResults.taxableIncome = Math.max(0, grossIncomeForTaxableCalculation -
+    // Calculate actual taxable income for the new monthly salary
+    newResults.taxableIncome = Math.max(0, grossIncomeForTaxableCalculation -
                                          newResults.personalAllowance -
                                          newResults.nisContribution -
                                          newResults.childAllowance -
                                          newActualInsuranceDeduction);
-        
-        // Income tax calculation
-        if (newResults.taxableIncome <= TAX_THRESHOLD) {
-            newResults.incomeTax = newResults.taxableIncome * TAX_RATE_1;
-        } else {
-            newResults.incomeTax = (TAX_THRESHOLD * TAX_RATE_1) +
-                                  ((newResults.taxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
-        }
+    
+    // Recalculate income tax for the new monthly salary
+    if (newResults.taxableIncome <= TAX_THRESHOLD) {
+        newResults.incomeTax = newResults.taxableIncome * TAX_RATE_1;
+    } else {
+        newResults.incomeTax = (TAX_THRESHOLD * TAX_RATE_1) +
+                              ((newResults.taxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
     }
     
-    // Recalculate net salary - GPSU and loan payments are deducted from net pay (not tax deductible)
+    // Recalculate net salary for the new monthly salary
     newResults.monthlyNetSalary = newResults.regularMonthlyGrossIncome -
                                   newResults.nisContribution -
                                   newResults.incomeTax -
                                   newResults.loanPayment -
-                                  newResults.gpsuDeduction;
-    
-    // Recalculate special month totals
-    newResults.monthSixTotal = newResults.monthlyNetSalary + newResults.sixMonthGratuity;
-    newResults.monthTwelveTotal = newResults.monthlyNetSalary + newResults.sixMonthGratuity + newResults.vacationAllowance;
-    
-    // Recalculate annual figures
+                                  newResults.creditUnionDeduction; // Renamed for clarity
+
+    // --- Retroactive Calculation ---
+    newResults.retroactiveMonthlyIncrease = 0;
+    newResults.totalRetroactiveLumpSum = 0;
+    newResults.netPayWithRetroactiveLumpSum = 0;
+
+    if (retroactiveMonths > 0) {
+        newResults.retroactiveMonthlyIncrease = monthlyBasicIncreaseAmount; // The increase per month
+        newResults.totalRetroactiveLumpSum = monthlyBasicIncreaseAmount * retroactiveMonths; // Total lump sum
+
+        // To calculate net pay for the retroactive month, we need to apply tax on the lump sum
+        // This means calculating tax for a hypothetical month where this lump sum is added to gross.
+        
+        // Hypothetical gross for the retroactive payment month (full new monthly gross + lump sum)
+        const grossForRetroMonth = newResults.regularMonthlyGrossIncome + newResults.totalRetroactiveLumpSum;
+
+        // Recalculate PA/NIS based on this temporarily inflated gross for retro month
+        const retroPersonalAllowance = Math.max(PERSONAL_ALLOWANCE, grossForRetroMonth / 3);
+        const retroNisContribution = Math.min(grossForRetroMonth * NIS_RATE, NIS_CEILING * NIS_RATE);
+        const retroActualInsuranceDeduction = Math.min(newResults.insurancePremium, grossForRetroMonth * 0.10, 50000);
+
+        // Calculate gross income for taxable calculation for the retroactive month
+        const retroGrossIncomeForTaxableCalculation = grossForRetroMonth - newResults.nonTaxableAllowances - newResults.overtimeAllowance - newResults.secondJobAllowance;
+
+        // Calculate taxable income for the retroactive payment month
+        const retroTaxableIncome = Math.max(0, retroGrossIncomeForTaxableCalculation - retroPersonalAllowance -
+                                       retroNisContribution - newResults.childAllowance - retroActualInsuranceDeduction);
+
+        // Calculate income tax for the retroactive payment month
+        let retroIncomeTax = 0;
+        if (retroTaxableIncome <= TAX_THRESHOLD) {
+            retroIncomeTax = retroTaxableIncome * TAX_RATE_1;
+        } else {
+            retroIncomeTax = (TAX_THRESHOLD * TAX_RATE_1) +
+                            ((retroTaxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
+        }
+
+        // Calculate Net Pay for the retroactive payment month
+        newResults.netPayWithRetroactiveLumpSum = grossForRetroMonth - retroNisContribution - retroIncomeTax - newResults.loanPayment - newResults.creditUnionDeduction;
+        
+        // Add the total retroactive lump sum to the annual total, as it's a one-time payment.
+        newResults.annualTotal += newResults.totalRetroactiveLumpSum;
+    }
+
+
+    // Recalculate annual figures based on new monthly net salary (already includes deductions)
     newResults.annualGrossIncome = newResults.regularMonthlyGrossIncome * 12;
     newResults.annualNisContribution = newResults.nisContribution * 12;
     newResults.annualTaxPayable = newResults.incomeTax * 12;
     newResults.annualGratuityTotal = newResults.sixMonthGratuity * 2;
-    newResults.annualTotal = (newResults.monthlyNetSalary * 12) + newResults.annualGratuityTotal + newResults.vacationAllowance;
-    
-    // Calculate differences for display
-    newResults.monthlyNetDifference = newResults.monthlyNetSalary - baseResults.monthlyNetSalary;
-    newResults.annualNetDifference = newResults.annualTotal - baseResults.annualTotal;
-    newResults.basicSalaryDifference = newResults.basicSalary - baseResults.basicSalary;
-    newResults.monthlyGratuityDifference = newResults.monthlyGratuityAccrual - baseResults.monthlyGratuityAccrual;
-    
+    // newResults.annualTotal already updated with retroactive lump sum if applicable
+
+
     return newResults;
 }
 
@@ -171,8 +200,9 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
  * Display the salary increase calculation results
  * @param {Object} results - The new calculation results
  * @param {Object} baseResults - The original calculation results
+ * @param {boolean} isRetroactive - Whether retroactive pay was calculated
  */
-function updateIncreaseResultsDisplay(results, baseResults) {
+function updateIncreaseResultsDisplay(results, baseResults, isRetroactive) {
     const increaseResults = document.getElementById('increase-results');
     if (increaseResults) {
         increaseResults.classList.remove('d-none');
@@ -206,4 +236,15 @@ function updateIncreaseResultsDisplay(results, baseResults) {
     document.getElementById('new-month-twelve-gratuity').textContent = formatCurrency(results.sixMonthGratuity);
     document.getElementById('new-month-twelve-vacation').textContent = formatCurrency(results.vacationAllowance);
     document.getElementById('new-month-twelve-total').textContent = formatCurrency(results.monthTwelveTotal);
+
+    // Retroactive Results Display
+    const retroactiveResultsDisplay = document.getElementById('retroactive-results-display');
+    if (isRetroactive && results.totalRetroactiveLumpSum > 0) {
+        retroactiveResultsDisplay.classList.remove('d-none');
+        document.getElementById('retro-monthly-increase').textContent = formatCurrency(results.retroactiveMonthlyIncrease);
+        document.getElementById('total-retro-lump-sum').textContent = formatCurrency(results.totalRetroactiveLumpSum);
+        document.getElementById('net-pay-with-retro').textContent = formatCurrency(results.netPayWithRetroactiveLumpSum);
+    } else {
+        retroactiveResultsDisplay.classList.add('d-none');
+    }
 }
