@@ -99,13 +99,14 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
 
     if (isTaxable) {
         // If the increase is taxable, the full increased gross is used for taxable income calculation
-        newResults.taxableIncome = Math.max(0, newResults.regularMonthlyGrossIncome -
+        // Calculate the 'taxable portion of gross income'
+        const grossIncomeForTaxableCalculation = newResults.regularMonthlyGrossIncome - newResults.nonTaxableAllowances - newResults.overtimeAllowance - newResults.secondJobAllowance;
+
+        newResults.taxableIncome = Math.max(0, grossIncomeForTaxableCalculation -
                                          newResults.personalAllowance -
                                          newResults.nisContribution -
                                          newResults.childAllowance -
-                                         newActualInsuranceDeduction - // Use the newly capped deduction
-                                         newResults.overtimeAllowance -
-                                         newResults.secondJobAllowance);
+                                         newActualInsuranceDeduction); // Use the newly capped deduction
         
         // Recalculate income tax based on the new taxable income
         if (newResults.taxableIncome <= TAX_THRESHOLD) {
@@ -120,13 +121,15 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable) {
         // unless other fixed deductions (like NIS cap) change due to higher gross.
         // We re-run the calculation here to ensure components like PA and NIS are correctly
         // recalculated based on the potentially higher overall gross.
-        newResults.taxableIncome = Math.max(0, newResults.regularMonthlyGrossIncome -
+
+        // Calculate the 'taxable portion of gross income'
+        const grossIncomeForTaxableCalculation = newResults.regularMonthlyGrossIncome - newResults.nonTaxableAllowances - newResults.overtimeAllowance - newResults.secondJobAllowance;
+
+        newResults.taxableIncome = Math.max(0, grossIncomeForTaxableCalculation -
                                          newResults.personalAllowance -
                                          newResults.nisContribution -
                                          newResults.childAllowance -
-                                         newActualInsuranceDeduction -
-                                         newResults.overtimeAllowance -
-                                         newResults.secondJobAllowance);
+                                         newActualInsuranceDeduction);
         
         // Income tax calculation
         if (newResults.taxableIncome <= TAX_THRESHOLD) {
