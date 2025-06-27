@@ -26,7 +26,7 @@ function calculateSalary() {
 
     } catch (error) {
         console.error("Calculation error:", error);
-        alert("There was an error in the calculation. Please check your inputs and try again.");
+        alert("There was an error in the calculation. Please check your inputs and try again.\n\nDetails: " + error.message); // Added error message to alert
     } finally {
         // Hide loading overlay
         hideLoadingOverlay();
@@ -42,7 +42,12 @@ function getInputValues() {
     const position = getSelectedPosition();
 
     // Basic salary
-    const basicSalary = parseFloat(document.getElementById('basic-salary').value) || 0;
+    const basicSalaryElement = document.getElementById('basic-salary');
+    if (!basicSalaryElement) {
+        debug("Error: 'basic-salary' element not found in the DOM.");
+        throw new Error("Missing 'Basic Monthly Salary' input element. Ensure index.html is fully updated and loaded.");
+    }
+    const basicSalary = parseFloat(basicSalaryElement.value) || 0;
 
     // Get taxable allowances
     let taxableAllowances = 0;
