@@ -76,7 +76,7 @@ function getInputValues() {
     const vacationAllowance = parseFloat(document.getElementById('vacation-allowance')?.value) || 0;
 
     // Get qualification allowance
-    const qualificationType = document.querySelector('input[name="qualification-type']:checked').value;
+    const qualificationType = document.querySelector('input[name="qualification-type"]:checked').value;
     const qualificationAllowance = QUALIFICATION_ALLOWANCES[qualificationType];
 
     // Add qualification allowance to non-taxable allowances as it's a non-taxable monthly payment
@@ -87,7 +87,7 @@ function getInputValues() {
     const secondJobIncome = parseFloat(document.getElementById('second-job').value) || 0;
     const childCount = parseInt(document.getElementById('children').value) || 0;
     const loanPayment = parseFloat(document.getElementById('loan-payment').value) || 0;
-    const gpsuDeduction = parseFloat(document.getElementById('gpsu-deduction').value) || 0;
+    const creditUnionDeduction = parseFloat(document.getElementById('credit-union-deduction').value) || 0; // Renamed for clarity
 
     // Insurance premium
     let insurancePremium = 0;
@@ -115,7 +115,7 @@ function getInputValues() {
         secondJobIncome,
         childCount,
         loanPayment,
-        gpsuDeduction,
+        creditUnionDeduction, // Renamed for clarity
         insurancePremium, // This is the premium amount paid/selected, not yet capped for deduction
         insuranceType,
         gratuityRate,
@@ -139,7 +139,7 @@ function performCalculations(inputs) {
         secondJobIncome,
         childCount,
         loanPayment,
-        gpsuDeduction,
+        creditUnionDeduction, // Renamed for clarity
         insurancePremium, // Premium amount paid/selected
         gratuityRate,
         gratuityPeriod
@@ -152,7 +152,7 @@ function performCalculations(inputs) {
     const sixMonthGratuity = monthlyGratuityAccrual * 6;
     
     // Calculate regular monthly gross income for display and for Personal Allowance/NIS base
-    // This figure represents your total gross earnings from all sources, before any tax-specific deductions.
+    // This figure represents your total gross earnings from all sources, before any tax-specific deductions are applied.
     const regularMonthlyGrossIncome = basicSalary + taxableAllowances + nonTaxableAllowances +
                                     overtimeIncome + secondJobIncome;
 
@@ -173,10 +173,9 @@ function performCalculations(inputs) {
     const actualInsuranceDeduction = Math.min(insurancePremium, regularMonthlyGrossIncome * 0.10, 50000);
 
 
-    // Calculate the 'taxable portion of gross income'
-    // This starts with all gross earnings and then removes components that are non-taxable from the start for PAYE purposes.
-    // E.g., if Gross is $300k, and $10k is non-taxable allowance and $3k is non-taxable overtime,
-    // this figure becomes $300k - $10k - $3k = $287k.
+    // Calculate the 'gross income for taxable calculation' as per GRA calculator's interpretation
+    // This is the full regular gross MINUS any components that are non-taxable from the start for PAYE.
+    // This aligns with the "Total Taxable Income" input description on the GRA's official calculator.
     const grossIncomeForTaxableCalculation = regularMonthlyGrossIncome - nonTaxableAllowances - overtimeAllowance - secondJobAllowance;
 
 
@@ -195,8 +194,8 @@ function performCalculations(inputs) {
     }
 
     // Calculate regular monthly net salary
-    // Loan payments and GPSU are deducted from net pay, as they are not tax-deductible
-    const monthlyNetSalary = regularMonthlyGrossIncome - nisContribution - incomeTax - loanPayment - gpsuDeduction;
+    // Loan payments and Credit Union deductions are from net pay, as they are not tax-deductible
+    const monthlyNetSalary = regularMonthlyGrossIncome - nisContribution - incomeTax - loanPayment - creditUnionDeduction;
 
     // PACKAGE CALCULATIONS
     
@@ -226,13 +225,14 @@ function performCalculations(inputs) {
         secondJobIncome,
         childCount,
         loanPayment,
-        gpsuDeduction,
+        creditUnionDeduction, // Renamed for clarity
         insurancePremium, // Original premium input
         actualInsuranceDeduction, // The amount actually deducted for tax purposes
         gratuityRate,
         
         // Monthly calculations
         regularMonthlyGrossIncome,
+        grossIncomeForTaxableCalculation, // For debugging/comparison
         personalAllowance,
         nisContribution,
         childAllowance,
