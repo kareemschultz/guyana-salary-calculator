@@ -60,7 +60,7 @@ function getInputValues() {
     // Get non-taxable allowances
     // NOTE: #vacation-allowance no longer has 'non-taxable-allowance' class in index.html
     // so it will not be summed here if multiple inputs are used.
-    let nonTaxableAllowances = 0;
+    let nonTaxableAllowances = 0; // This will hold sum of Tel/Internet, Travel, Station, Subsistence, etc.
     if (document.getElementById('single-non-taxable-allowance') &&
         document.getElementById('single-non-taxable-allowance').classList.contains('d-none')) {
         // Multiple allowances are showing
@@ -76,7 +76,7 @@ function getInputValues() {
     const vacationAllowance = parseFloat(document.getElementById('vacation-allowance')?.value) || 0;
 
     // Get qualification allowance
-    const qualificationType = document.querySelector('input[name="qualification-type"]:checked').value;
+    const qualificationType = document.querySelector('input[name="qualification-type']:checked').value;
     const qualificationAllowance = QUALIFICATION_ALLOWANCES[qualificationType];
 
     // Add qualification allowance to non-taxable allowances as it's a non-taxable monthly payment
@@ -107,7 +107,7 @@ function getInputValues() {
         position,
         basicSalary,
         taxableAllowances,
-        nonTaxableAllowances, // This now correctly excludes the annual vacationAllowance lump sum
+        nonTaxableAllowances, // This now correctly holds sum of Tel/Internet, Travel, Qualification etc.
         vacationAllowance, // This is the annual lump sum for Month 12 payment
         qualificationType,
         qualificationAllowance,
@@ -151,33 +151,39 @@ function performCalculations(inputs) {
     // Six month accumulated gratuity (paid at the 6-month mark)
     const sixMonthGratuity = monthlyGratuityAccrual * 6;
     
-    // Calculate regular monthly gross income for personal allowance and NIS calculation
-    // This gross includes all income before tax-specific deductions
+    // Calculate regular monthly gross income for display and for Personal Allowance/NIS base
+    // This figure represents your total gross earnings from all sources, before any tax-specific deductions.
     const regularMonthlyGrossIncome = basicSalary + taxableAllowances + nonTaxableAllowances +
                                     overtimeIncome + secondJobIncome;
 
-    // Apply the cap for insurance premium deduction
-    // Deduction is lesser of premiums paid, 10% of gross income, or $50,000 monthly
-    const actualInsuranceDeduction = Math.min(insurancePremium, regularMonthlyGrossIncome * 0.10, 50000);
-
     // Calculate deductions that reduce taxable income
-    // Personal Allowance: Greater of $130,000 or 1/3 of gross income
+    // Personal Allowance: Greater of $130,000 or 1/3 of regularMonthlyGrossIncome
     const personalAllowance = Math.max(PERSONAL_ALLOWANCE, regularMonthlyGrossIncome / 3);
-    // NIS Contribution: 5.6% of gross income up to $280,000 monthly ceiling
+    // NIS Contribution: 5.6% of regularMonthlyGrossIncome up to $280,000 monthly ceiling
     const nisContribution = Math.min(regularMonthlyGrossIncome * NIS_RATE, NIS_CEILING * NIS_RATE);
     // Child Allowance: $10,000 per child per month
     const childAllowance = childCount * CHILD_ALLOWANCE;
+    
     // Overtime Allowance (non-taxable portion): Lesser of actual overtime or $50,000 monthly
     const overtimeAllowance = Math.min(overtimeIncome, OVERTIME_ALLOWANCE_MAX);
     // Second Job Allowance (non-taxable portion): Lesser of actual second job income or $50,000 monthly
     const secondJobAllowance = Math.min(secondJobIncome, SECOND_JOB_ALLOWANCE_MAX);
 
+    // Apply the cap for insurance premium deduction based on full regularMonthlyGrossIncome
+    const actualInsuranceDeduction = Math.min(insurancePremium, regularMonthlyGrossIncome * 0.10, 50000);
 
-    // Calculate taxable income (Chargeable Income)
-    // Deduct all statutory allowances/deductions from the regular gross income
-    const taxableIncome = Math.max(0, regularMonthlyGrossIncome - personalAllowance -
-                            nisContribution - childAllowance - actualInsuranceDeduction -
-                            overtimeAllowance - secondJobAllowance); // Subtracted non-taxable portions
+
+    // Calculate the 'taxable portion of gross income'
+    // This starts with all gross earnings and then removes components that are non-taxable from the start for PAYE purposes.
+    // E.g., if Gross is $300k, and $10k is non-taxable allowance and $3k is non-taxable overtime,
+    // this figure becomes $300k - $10k - $3k = $287k.
+    const grossIncomeForTaxableCalculation = regularMonthlyGrossIncome - nonTaxableAllowances - overtimeAllowance - secondJobAllowance;
+
+
+    // Calculate actual taxable income (Chargeable Income) for PAYE
+    // This is the adjusted gross income MINUS all statutory deductions
+    const taxableIncome = Math.max(0, grossIncomeForTaxableCalculation - personalAllowance -
+                            nisContribution - childAllowance - actualInsuranceDeduction);
 
     // Calculate income tax (PAYE)
     let incomeTax = 0;
