@@ -52,11 +52,11 @@ function setupEventListeners() {
             if (multipleSection.classList.contains('d-none')) {
                 icon.classList.remove('fa-minus-circle');
                 icon.classList.add('fa-plus-circle');
-                text.textContent = 'Add Multiple';
+                text.textContent = 'Enter Detailed Taxable Allowances'; // Changed text
             } else {
                 icon.classList.remove('fa-plus-circle');
                 icon.classList.add('fa-minus-circle');
-                text.textContent = 'Show Single';
+                text.textContent = 'Enter Total Taxable Allowances'; // Changed text
                 
                 // Calculate total when switching to multiple
                 calculateTaxableAllowancesTotal();
@@ -81,11 +81,11 @@ function setupEventListeners() {
             if (multipleSection.classList.contains('d-none')) {
                 icon.classList.remove('fa-minus-circle');
                 icon.classList.add('fa-plus-circle');
-                text.textContent = 'Add Multiple';
+                text.textContent = 'Enter Detailed Non-Taxable Allowances'; // Changed text
             } else {
                 icon.classList.remove('fa-plus-circle');
                 icon.classList.add('fa-minus-circle');
-                text.textContent = 'Show Single';
+                text.textContent = 'Enter Total Non-Taxable Allowances'; // Changed text
                 
                 // Calculate total when switching to multiple
                 calculateNonTaxableAllowancesTotal();
@@ -116,6 +116,24 @@ function setupEventListeners() {
             }
         });
     }
+    
+    // Toggle retroactive section - moved from salary-increase.js to here for general event listeners setup
+    const toggleRetroactive = document.getElementById('toggle-retroactive');
+    if (toggleRetroactive) {
+        toggleRetroactive.addEventListener('change', function() {
+            const retroactiveSection = document.getElementById('retroactive-section');
+            const retroactiveResultsDisplay = document.getElementById('retroactive-results-display');
+            if (this.checked) {
+                retroactiveSection.classList.remove('d-none');
+                // Ensure retroactive results display if there's a calculation to show
+                // This might be initially hidden by updateIncreaseResultsDisplay if not applicable
+            } else {
+                retroactiveSection.classList.add('d-none');
+                retroactiveResultsDisplay.classList.add('d-none'); // Hide results if toggle off
+            }
+        });
+    }
+
 
     // Insurance dropdown
     const insuranceDropdown = document.getElementById('insurance');
@@ -222,8 +240,11 @@ function calculateTaxableAllowancesTotal() {
  */
 function calculateNonTaxableAllowancesTotal() {
     let total = 0;
+    // Exclude vacation-allowance from this sum because it's handled as an annual lump sum separately.
     document.querySelectorAll('.non-taxable-allowance').forEach(function(input) {
-        total += parseFloat(input.value) || 0;
+        if (input.id !== 'vacation-allowance') { // Explicitly exclude vacation-allowance
+            total += parseFloat(input.value) || 0;
+        }
     });
 
     const totalElement = document.getElementById('non-taxable-allowances-total');
@@ -253,9 +274,9 @@ function updateResultsDisplay(results) {
     document.getElementById('result-child').textContent = formatCurrency(results.childAllowance);
     document.getElementById('result-overtime').textContent = formatCurrency(results.overtimeAllowance);
     document.getElementById('result-second-job').textContent = formatCurrency(results.secondJobAllowance);
-    document.getElementById('result-insurance').textContent = formatCurrency(results.insurancePremium);
+    document.getElementById('result-insurance').textContent = formatCurrency(results.actualInsuranceDeduction); // Use actual deducted amount
     document.getElementById('result-loan-deductions').textContent = formatCurrency(results.loanPayment);
-    document.getElementById('result-gpsu-deduction').textContent = formatCurrency(results.gpsuDeduction);
+    document.getElementById('result-credit-union-deduction').textContent = formatCurrency(results.creditUnionDeduction); // Updated ID and variable name
     document.getElementById('result-taxable-income').textContent = formatCurrency(results.taxableIncome);
     document.getElementById('result-tax').textContent = formatCurrency(results.incomeTax);
     document.getElementById('result-monthly-gratuity').textContent = formatCurrency(results.monthlyGratuityAccrual);
