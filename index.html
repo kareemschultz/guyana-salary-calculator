@@ -516,12 +516,12 @@
                                     <div class="form-text">Enter total monthly loan payment amounts (if any)</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="gpsu-deduction" class="form-label">GPSU Membership</label>
+                                    <label for="credit-union-deduction" class="form-label">GPSC Credit Union Deduction</label>
                                     <div class="input-group">
                                         <span class="input-group-text">GYD $</span>
-                                        <input type="number" class="form-control" id="gpsu-deduction" placeholder="0">
+                                        <input type="number" class="form-control" id="credit-union-deduction" placeholder="0">
                                     </div>
-                                    <div class="form-text">GPSU Deduction (Guyana Public Service Co-Operative Credit Union)</div>
+                                    <div class="form-text">Guyana Public Service Co-Operative Credit Union</div>
                                 </div>
                             </div>
                         </div>
@@ -608,6 +608,20 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-retroactive">
+                                <label class="form-check-label" for="toggle-retroactive">Is this increase retroactive?</label>
+                            </div>
+
+                            <div id="retroactive-section" class="d-none mb-3">
+                                <label for="retroactive-months" class="form-label">Number of Retroactive Months</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="retroactive-months" value="1" min="1" max="12">
+                                    <span class="input-group-text">Months</span>
+                                </div>
+                                <div class="form-text">The number of past months for which the increase is applied and paid as a lump sum.</div>
+                            </div>
 
                             <button id="calculate-increase-btn" class="btn btn-success w-100">
                                 <i class="fas fa-percentage me-2"></i> Calculate With Salary Increase
@@ -625,7 +639,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <h6 class="border-bottom pb-2 mb-3">Monthly Comparison</h6>
-
+                                                
                                                 <div class="mb-3">
                                                     <div class="d-flex justify-content-between mb-1">
                                                         <small class="text-muted">Basic Salary:</small>
@@ -650,10 +664,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-
+                                            
                                             <div class="col-md-6">
                                                 <h6 class="border-bottom pb-2 mb-3">Annual Comparison</h6>
-
+                                                
                                                 <div class="mb-3">
                                                     <div class="d-flex justify-content-between mb-1">
                                                         <small class="text-muted">Annual Gross Income:</small>
@@ -681,9 +695,9 @@
                                                 </div>
                                             </div>
                                         </div>
-
+                                        
                                         <h6 class="border-bottom pb-2 mb-3 mt-2">Special Payment Months</h6>
-
+                                        
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <h6 class="fw-bold text-primary"><i class="fas fa-calendar-alt me-2"></i>Month 6 Payment</h6>
@@ -700,7 +714,7 @@
                                                     <span id="new-month-six-total" class="fw-bold">$0.00</span>
                                                 </div>
                                             </div>
-
+                                            
                                             <div class="col-md-6">
                                                 <h6 class="fw-bold text-primary"><i class="fas fa-calendar-alt me-2"></i>Month 12 Payment</h6>
                                                 <div class="d-flex justify-content-between mb-1">
@@ -719,6 +733,25 @@
                                                     <small>MONTH 12 TOTAL PAYMENT:</small>
                                                     <span id="new-month-twelve-total">$0.00</span>
                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="retroactive-results-display" class="d-none mt-4">
+                                            <h6 class="border-bottom pb-2 mb-3">Retroactive Payment Details</h6>
+                                            <div class="result-row">
+                                                <small class="result-label">Monthly Increase in Basic Pay:</small>
+                                                <span id="retro-monthly-increase" class="result-value positive">$0.00</span>
+                                            </div>
+                                            <div class="result-row">
+                                                <small class="result-label">Total Retroactive Lump Sum (Taxable):</small>
+                                                <span id="total-retro-lump-sum" class="result-value positive">$0.00</span>
+                                            </div>
+                                            <div class="result-row total-row">
+                                                <small class="result-label">NET PAY FOR RETROACTIVE MONTH (Lump Sum Included):</small>
+                                                <span id="net-pay-with-retro" class="result-value">$0.00</span>
+                                            </div>
+                                            <div class="form-text mt-2">
+                                                This reflects your net pay for the month you receive the retroactive lump sum.
                                             </div>
                                         </div>
                                     </div>
@@ -793,8 +826,8 @@
                         </div>
 
                         <div class="result-row">
-                            <span class="result-label">GPSU Membership Deduction:</span>
-                            <span class="result-value negative" id="result-gpsu-deduction">$0.00</span>
+                            <span class="result-label">Credit Union Deduction:</span>
+                            <span class="result-value negative" id="result-credit-union-deduction">$0.00</span>
                         </div>
 
                         <div class="result-row">
@@ -857,7 +890,7 @@
                     <div class="card-header">
                         <h5 class="section-title mb-0">
                             <i class="fas fa-box-open"></i> Special Payment Months
-                        </h5>
+                        </h4>
                     </div>
                     <div class="card-body">
                         <div class="mb-4">
@@ -916,7 +949,7 @@
                     <div class="card-header">
                         <h5 class="section-title mb-0">
                             <i class="fas fa-chart-pie"></i> Income Breakdown
-                        </h5>
+                        </h4>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
@@ -929,7 +962,7 @@
                     <div class="card-header">
                         <h5 class="section-title mb-0">
                             <i class="fas fa-chart-bar"></i> Tax Bracket Analysis
-                        </h4>
+                        </h5>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
