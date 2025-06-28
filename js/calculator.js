@@ -83,34 +83,34 @@ function getInputValues() {
     const vacationAllowance = parseFloat(document.getElementById('vacation-allowance')?.value) || 0;
 
     // Get qualification allowance for current frequency
-    const qualificationType = document.querySelector('input[name="qualification-type"]:checked').value;
+    const qualificationType = document.querySelector('input[name="qualification-type"]:checked')?.value || 'none';
     const qualificationAllowance = getQualificationAllowanceForFrequency(qualificationType);
 
     // Add qualification allowance to non-taxable allowances as it's a non-taxable payment
     nonTaxableAllowances += qualificationAllowance;
 
     // Get other income and deductions
-    const overtimeIncome = parseFloat(document.getElementById('overtime').value) || 0;
-    const secondJobIncome = parseFloat(document.getElementById('second-job').value) || 0;
-    const childCount = parseInt(document.getElementById('children').value) || 0;
-    const loanPayment = parseFloat(document.getElementById('loan-payment').value) || 0;
-    const creditUnionDeduction = parseFloat(document.getElementById('credit-union-deduction').value) || 0;
+    const overtimeIncome = parseFloat(document.getElementById('overtime')?.value) || 0;
+    const secondJobIncome = parseFloat(document.getElementById('second-job')?.value) || 0;
+    const childCount = parseInt(document.getElementById('children')?.value) || 0;
+    const loanPayment = parseFloat(document.getElementById('loan-payment')?.value) || 0;
+    const creditUnionDeduction = parseFloat(document.getElementById('credit-union-deduction')?.value) || 0;
 
     // Insurance premium - convert to current frequency if needed
     let insurancePremium = 0;
-    const insuranceType = document.getElementById('insurance').value;
+    const insuranceType = document.getElementById('insurance')?.value || 'none';
 
     if (insuranceType === 'custom') {
-        insurancePremium = parseFloat(document.getElementById('custom-premium').value) || 0;
+        insurancePremium = parseFloat(document.getElementById('custom-premium')?.value) || 0;
     } else {
         // Convert monthly insurance premiums to current frequency
-        const monthlyPremium = INSURANCE_PREMIUMS[insuranceType];
+        const monthlyPremium = INSURANCE_PREMIUMS[insuranceType] || 0;
         insurancePremium = convertFromMonthly(monthlyPremium, paymentFrequency);
     }
 
     // Gratuity options
-    const gratuityRate = parseFloat(document.getElementById('gratuity-rate').value) || 22.5;
-    const gratuityPeriod = parseInt(document.getElementById('gratuity-period').value) || 6;
+    const gratuityRate = parseFloat(document.getElementById('gratuity-rate')?.value) || 22.5;
+    const gratuityPeriod = parseInt(document.getElementById('gratuity-period')?.value) || 6;
 
     return {
         position,
@@ -147,6 +147,7 @@ function performCalculations(inputs) {
         taxableAllowances,
         nonTaxableAllowances,
         vacationAllowance,
+        qualificationType,
         qualificationAllowance,
         overtimeIncome,
         secondJobIncome,
