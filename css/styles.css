@@ -873,6 +873,47 @@ input:checked + .toggle-label .toggle-ball {
     animation: fadeIn 0.5s ease forwards;
 }
 
+/* GitHub Link Styling */
+.footer .github-link {
+    color: var(--primary) !important;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.footer .github-link:hover {
+    color: var(--text-primary) !important;
+    text-decoration: underline;
+    transform: translateY(-1px);
+}
+
+.footer .github-link i {
+    font-size: 0.9rem;
+    color: inherit !important;
+}
+
+/* Dark mode specific styling for GitHub link */
+[data-theme="dark"] .footer .github-link {
+    color: #60a5fa !important;
+}
+
+[data-theme="dark"] .footer .github-link:hover {
+    color: #93c5fd !important;
+}
+
+/* Footer name styling */
+.footer strong {
+    color: var(--primary) !important;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .footer strong {
+    color: #60a5fa !important;
+}
+
 /* RESPONSIVE DESIGN */
 @media (max-width: 1200px) {
     .info-cards-grid {
