@@ -9,6 +9,133 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Additional styles for improved layout */
+        .results-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .results-summary h3 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .section-divider {
+            margin: 3rem 0;
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+        
+        .simulator-section {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #2d3748;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .simulator-section h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        
+        .comparison-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        [data-theme="dark"] .comparison-card {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .simulator-section {
+            color: #e2e8f0;
+        }
+        
+        [data-theme="dark"] .simulator-section h3 {
+            color: #e2e8f0;
+        }
+        
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-stat {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .quick-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+        
+        .quick-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .results-summary {
+                padding: 1.5rem;
+            }
+            
+            .simulator-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -263,7 +390,7 @@
                             </div>
 
                             <div id="multiple-taxable-allowances" class="d-none">
-                                <!-- Multiple taxable allowances fields -->
+                                <!-- Multiple taxable allowances fields - keeping same as before -->
                                 <div class="row mb-2">
                                     <div class="col-md-6 mb-2">
                                         <label for="duty-allowance" class="form-label">
@@ -284,6 +411,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!-- Continue with other fields as before... -->
                                 <div class="row mb-2">
                                     <div class="col-md-6 mb-2">
                                         <label for="housing-allowance" class="form-label">
@@ -344,7 +472,7 @@
                             </div>
                         </div>
 
-                        <!-- Non-Taxable Allowances Section -->
+                        <!-- Non-Taxable Allowances Section - keeping same structure -->
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="fw-bold mb-0">
@@ -852,6 +980,14 @@
                                 <span class="result-value" id="result-non-taxable-allowances">$0.00</span>
                             </div>
 
+                            <!-- Add this row for qualification allowance -->
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-graduation-cap me-1"></i> Qualification Allowance:
+                                </span>
+                                <span class="result-value positive" id="result-qualification-allowance">$0.00</span>
+                            </div>
+
                             <div class="result-row">
                                 <span class="result-label">
                                     <i class="fas fa-money-bill-wave me-1"></i> Total Gross Income:
@@ -960,6 +1096,10 @@
                                         <span class="result-value" id="result-annual-gross">$0.00</span>
                                     </div>
                                     <div class="result-row">
+                                        <span class="result-label">Annual NIS:</span>
+                                        <span class="result-value negative" id="result-annual-nis">$0.00</span>
+                                    </div>
+                                    <div class="result-row">
                                         <span class="result-label">Annual Tax:</span>
                                         <span class="result-value negative" id="result-annual-tax">$0.00</span>
                                     </div>
@@ -986,14 +1126,34 @@
                                     <div class="mb-3">
                                         <strong class="text-primary">Month 6:</strong>
                                         <div class="d-flex justify-content-between">
-                                            <small>Net + Gratuity:</small>
+                                            <small>Monthly Net:</small>
+                                            <span id="result-month-six-net">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <small>Gratuity Payment:</small>
+                                            <span id="result-month-six-gratuity">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between fw-bold">
+                                            <small>Total (Net + Gratuity):</small>
                                             <span id="result-month-six-total">$0.00</span>
                                         </div>
                                     </div>
                                     <div>
                                         <strong class="text-primary">Month 12:</strong>
                                         <div class="d-flex justify-content-between">
-                                            <small>Net + Gratuity + Vacation:</small>
+                                            <small>Monthly Net:</small>
+                                            <span id="result-month-twelve-net">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <small>Gratuity Payment:</small>
+                                            <span id="result-month-twelve-gratuity">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <small>Vacation Allowance:</small>
+                                            <span id="result-month-twelve-vacation">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between fw-bold">
+                                            <small>Total (Net + Gratuity + Vacation):</small>
                                             <span id="result-month-twelve-total">$0.00</span>
                                         </div>
                                     </div>
@@ -1318,98 +1478,6 @@
     <script src="js/salary-increase.js"></script>
     <script src="js/main.js"></script>
 
-    <script>
-        // FIXED: Safe helper function for updating DOM elements
-        function safeElementUpdate(elementId, value) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.textContent = value;
-                return true;
-            } else {
-                console.warn(`Element with ID '${elementId}' not found in DOM`);
-                return false;
-            }
-        }
-
-        // FIXED: Updated function to show/hide sections properly with error handling
-        function showResultsSections() {
-            const sections = [
-                'results-summary',
-                'quick-stats', 
-                'detailed-results',
-                'simulator-divider',
-                'salary-increase-section',
-                'charts-divider',
-                'charts-section'
-            ];
-            
-            sections.forEach(sectionId => {
-                const element = document.getElementById(sectionId);
-                if (element) {
-                    element.style.display = 'block';
-                } else {
-                    console.warn(`Section '${sectionId}' not found`);
-                }
-            });
-        }
-
-        // FIXED: Update the summary display with proper error handling
-        function updateSummaryDisplay(results) {
-            if (!results) {
-                console.error('No results provided to updateSummaryDisplay');
-                return;
-            }
-
-            try {
-                // Update summary cards safely
-                safeElementUpdate('summary-net-monthly', formatCurrency(results.monthlyNetSalary));
-                safeElementUpdate('summary-annual-net', formatCurrency(results.annualTotal));
-                safeElementUpdate('summary-month-six', formatCurrency(results.monthSixTotal));
-                safeElementUpdate('summary-month-twelve', formatCurrency(results.monthTwelveTotal));
-
-                // Update quick stats safely
-                const effectiveTaxRate = ((results.incomeTax / results.regularMonthlyGrossIncome) * 100) || 0;
-                const retentionRate = ((results.monthlyNetSalary / results.regularMonthlyGrossIncome) * 100) || 0;
-                
-                safeElementUpdate('stat-tax-rate', effectiveTaxRate.toFixed(1) + '%');
-                safeElementUpdate('stat-retention', retentionRate.toFixed(1) + '%');
-                safeElementUpdate('stat-gratuity', formatCurrency(results.monthlyGratuityAccrual));
-                safeElementUpdate('stat-nis', formatCurrency(results.nisContribution));
-
-                // Show all results sections
-                showResultsSections();
-            } catch (error) {
-                console.error('Error in updateSummaryDisplay:', error);
-            }
-        }
-
-        // FIXED: Override the existing updateResultsDisplay function safely
-        document.addEventListener('DOMContentLoaded', function() {
-            // Store the original function
-            const originalUpdateResultsDisplay = window.updateResultsDisplay;
-            
-            // Override with safe version
-            window.updateResultsDisplay = function(results) {
-                try {
-                    // Call original function to populate detailed results
-                    if (typeof originalUpdateResultsDisplay === 'function') {
-                        originalUpdateResultsDisplay(results);
-                    }
-                    
-                    // Add summary display
-                    updateSummaryDisplay(results);
-                } catch (error) {
-                    console.error('Error in updateResultsDisplay override:', error);
-                    // If there's an error, still try to show results without crashing
-                    try {
-                        updateSummaryDisplay(results);
-                    } catch (summaryError) {
-                        console.error('Error in updateSummaryDisplay fallback:', summaryError);
-                        alert('There was an error displaying the results. Please try again.');
-                    }
-                }
-            };
-        });
-    </script>
+    <!-- REMOVED ALL INLINE JAVASCRIPT - Now using separate files only -->
 </body>
 </html>
