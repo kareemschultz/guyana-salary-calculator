@@ -9,6 +9,133 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Additional styles for improved layout */
+        .results-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .results-summary h3 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .section-divider {
+            margin: 3rem 0;
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+        
+        .simulator-section {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #2d3748;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .simulator-section h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        
+        .comparison-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        [data-theme="dark"] .comparison-card {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .simulator-section {
+            color: #e2e8f0;
+        }
+        
+        [data-theme="dark"] .simulator-section h3 {
+            color: #e2e8f0;
+        }
+        
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-stat {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .quick-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+        
+        .quick-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .results-summary {
+                padding: 1.5rem;
+            }
+            
+            .simulator-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -143,7 +270,8 @@
     <!-- Main Calculator Content -->
     <div class="container-fluid pb-5">
         <div class="row">
-            <div class="col-lg-7">
+            <!-- INPUT SECTION -->
+            <div class="col-lg-6">
                 <!-- Personal Information Card -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -262,6 +390,7 @@
                             </div>
 
                             <div id="multiple-taxable-allowances" class="d-none">
+                                <!-- Multiple taxable allowances fields - keeping same as before -->
                                 <div class="row mb-2">
                                     <div class="col-md-6 mb-2">
                                         <label for="duty-allowance" class="form-label">
@@ -282,6 +411,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!-- Continue with other fields as before... -->
                                 <div class="row mb-2">
                                     <div class="col-md-6 mb-2">
                                         <label for="housing-allowance" class="form-label">
@@ -342,7 +472,7 @@
                             </div>
                         </div>
 
-                        <!-- Non-Taxable Allowances Section -->
+                        <!-- Non-Taxable Allowances Section - keeping same structure -->
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="fw-bold mb-0">
@@ -373,6 +503,7 @@
                             </div>
 
                             <div id="multiple-non-taxable-allowances" class="d-none">
+                                <!-- Multiple non-taxable allowances fields -->
                                 <div class="row mb-2">
                                     <div class="col-md-6 mb-2">
                                         <label for="travel-allowance" class="form-label">
@@ -768,209 +899,230 @@
                         <button id="calculate-btn" class="btn btn-primary btn-lg w-100 mb-3">
                             <i class="fas fa-calculator me-2"></i> Calculate Salary & Gratuity
                         </button>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Salary Increase Simulator Section -->
-                        <div id="salary-increase-section" class="mt-4 d-none">
-                            <hr>
-                            <div class="d-flex align-items-center mb-3">
-                                <i class="fas fa-chart-line text-success me-2 fa-lg"></i>
-                                <h5 class="fw-bold text-success mb-0">Salary Increase Simulator</h5>
+            <!-- RESULTS SECTION -->
+            <div class="col-lg-6">
+                <!-- Results Summary Card -->
+                <div class="results-summary" style="display: none;" id="results-summary">
+                    <h3><i class="fas fa-chart-line me-2"></i>Your Salary Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-value" id="summary-net-monthly">$0</span>
+                            <span class="summary-label">Monthly Take-Home</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value" id="summary-annual-net">$0</span>
+                            <span class="summary-label">Annual Package</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value" id="summary-month-six">$0</span>
+                            <span class="summary-label">Month 6 Total</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value" id="summary-month-twelve">$0</span>
+                            <span class="summary-label">Month 12 Total</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats" style="display: none;" id="quick-stats">
+                    <div class="quick-stat">
+                        <span class="quick-stat-value" id="stat-tax-rate">0%</span>
+                        <span class="quick-stat-label">Effective Tax Rate</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-value" id="stat-retention">0%</span>
+                        <span class="quick-stat-label">Income Retention</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-value" id="stat-gratuity">$0</span>
+                        <span class="quick-stat-label">Monthly Gratuity</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-value" id="stat-nis">$0</span>
+                        <span class="quick-stat-label">NIS Contribution</span>
+                    </div>
+                </div>
+
+                <!-- Detailed Results Cards -->
+                <div class="results-section" style="display: none;" id="detailed-results">
+                    <!-- Monthly Results Card -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="section-title mb-0">
+                                <i class="fas fa-chart-line"></i> Monthly Breakdown
+                            </h5>
+                            <small class="text-muted">Your regular monthly salary calculation</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-dollar-sign me-1"></i> Basic Salary:
+                                </span>
+                                <span class="result-value" id="result-basic">$0.00</span>
                             </div>
 
-                            <p class="small">Simulate the impact of a potential salary increase on your take-home pay, gratuity benefits, and annual income. Perfect for evaluating promotion offers or annual raises.</p>
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-coins me-1"></i> Taxable Allowances:
+                                </span>
+                                <span class="result-value" id="result-taxable-allowances">$0.00</span>
+                            </div>
 
-                            <div class="row mb-3">
-                                <div class="col-md-4 mb-2">
-                                    <label for="increase-percentage" class="form-label">
-                                        <i class="fas fa-arrow-up me-1"></i> Increase Percentage
-                                    </label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" id="increase-percentage" value="6" min="0" max="100" step="0.1">
-                                        <span class="input-group-text">%</span>
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-hand-holding-usd me-1"></i> Non-Taxable Allowances:
+                                </span>
+                                <span class="result-value" id="result-non-taxable-allowances">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-money-bill-wave me-1"></i> Total Gross Income:
+                                </span>
+                                <span class="result-value" id="result-gross">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-shield-alt me-1"></i> Personal Allowance (Free Pay):
+                                </span>
+                                <span class="result-value positive" id="result-personal-allowance">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-university me-1"></i> NIS Contribution:
+                                </span>
+                                <span class="result-value negative" id="result-nis">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-child me-1"></i> Child Allowance:
+                                </span>
+                                <span class="result-value positive" id="result-child">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-clock me-1"></i> Overtime Allowance (non-taxable):
+                                </span>
+                                <span class="result-value positive" id="result-overtime">$0.00</span>
+                            </div>
+
+                            <div class="result-row" id="second-job-result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-briefcase me-1"></i> Second Job Allowance (non-taxable):
+                                </span>
+                                <span class="result-value positive" id="result-second-job">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-shield-alt me-1"></i> Insurance Premium Deduction:
+                                </span>
+                                <span class="result-value positive" id="result-insurance">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-credit-card me-1"></i> Loan Deductions:
+                                </span>
+                                <span class="result-value negative" id="result-loan-deductions">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-university me-1"></i> Credit Union Deduction:
+                                </span>
+                                <span class="result-value negative" id="result-credit-union-deduction">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-calculator me-1"></i> Taxable Income:
+                                </span>
+                                <span class="result-value" id="result-taxable-income">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-percentage me-1"></i> Income Tax (25%/35%):
+                                </span>
+                                <span class="result-value negative" id="result-tax">$0.00</span>
+                            </div>
+
+                            <div class="result-row">
+                                <span class="result-label">
+                                    <i class="fas fa-gift me-1"></i> Monthly Gratuity Accrual:
+                                </span>
+                                <span class="result-value positive" id="result-monthly-gratuity">$0.00</span>
+                            </div>
+
+                            <div class="result-row total-row">
+                                <span class="result-label">
+                                    <i class="fas fa-wallet me-1"></i> NET TAKE-HOME SALARY:
+                                </span>
+                                <span class="result-value" id="result-net">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Annual & Special Payments -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="section-title mb-0">
+                                        <i class="fas fa-calendar-year"></i> Annual Package
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="result-row">
+                                        <span class="result-label">Annual Gross:</span>
+                                        <span class="result-value" id="result-annual-gross">$0.00</span>
+                                    </div>
+                                    <div class="result-row">
+                                        <span class="result-label">Annual Tax:</span>
+                                        <span class="result-value negative" id="result-annual-tax">$0.00</span>
+                                    </div>
+                                    <div class="result-row">
+                                        <span class="result-label">Annual Gratuity:</span>
+                                        <span class="result-value positive" id="result-annual-gratuity">$0.00</span>
+                                    </div>
+                                    <div class="result-row total-row">
+                                        <span class="result-label">ANNUAL NET:</span>
+                                        <span class="result-value" id="result-annual-net">$0.00</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="col-md-8 mb-2">
-                                    <label class="form-label d-block">
-                                        <i class="fas fa-coins me-1"></i> Is the increase taxable?
-                                    </label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="increase-taxable" id="increase-taxable-yes" value="yes" checked>
-                                        <label class="form-check-label" for="increase-taxable-yes">
-                                            <i class="fas fa-check me-1"></i> Yes, increase is taxable
-                                        </label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="increase-taxable" id="increase-taxable-no" value="no">
-                                        <label class="form-check-label" for="increase-taxable-no">
-                                            <i class="fas fa-times me-1"></i> No, increase is non-taxable
-                                        </label>
-                                    </div>
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="section-title mb-0">
+                                        <i class="fas fa-gift"></i> Special Months
+                                    </h6>
                                 </div>
-                            </div>
-                            
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="toggle-retroactive">
-                                <label class="form-check-label" for="toggle-retroactive">
-                                    <i class="fas fa-history me-1"></i> Is this increase retroactive?
-                                </label>
-                            </div>
-
-                            <div id="retroactive-section" class="d-none mb-3">
-                                <label for="retroactive-months" class="form-label">
-                                    <i class="fas fa-calendar-plus me-1"></i> Number of Retroactive Months
-                                </label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="retroactive-months" value="1" min="1" max="12">
-                                    <span class="input-group-text">Months</span>
-                                </div>
-                                <div class="form-text">The number of past months for which the increase is applied and paid as a lump sum.</div>
-                            </div>
-
-                            <button id="calculate-increase-btn" class="btn btn-success w-100">
-                                <i class="fas fa-percentage me-2"></i> Calculate With Salary Increase
-                            </button>
-
-                            <!-- Increase Results Display -->
-                            <div id="increase-results" class="mt-4 d-none">
-                                <div class="card border-success">
-                                    <div class="card-header bg-success text-white">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-arrow-up me-2"></i>
-                                            <h6 class="mb-0 fw-bold">Salary Increase Results</h6>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <strong class="text-primary">Month 6:</strong>
+                                        <div class="d-flex justify-content-between">
+                                            <small>Net + Gratuity:</small>
+                                            <span id="result-month-six-total">$0.00</span>
                                         </div>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h6 class="border-bottom pb-2 mb-3">
-                                                    <i class="fas fa-calendar-week me-1"></i> Monthly Comparison
-                                                </h6>
-                                                
-                                                <div class="mb-3">
-                                                    <div class="d-flex justify-content-between mb-1">
-                                                        <small class="text-muted">Basic Salary:</small>
-                                                        <div class="d-flex align-items-center">
-                                                            <span id="new-basic-salary" class="fw-bold">$0.00</span>
-                                                            <span id="basic-salary-diff" class="ms-2 badge bg-success">+$0.00</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between mb-1">
-                                                        <small class="text-muted">Monthly Take-Home:</small>
-                                                        <div class="d-flex align-items-center">
-                                                            <span id="new-monthly-net" class="fw-bold">$0.00</span>
-                                                            <span id="monthly-increase" class="ms-2 badge bg-success">+$0.00</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between">
-                                                        <small class="text-muted">Monthly Gratuity Accrual:</small>
-                                                        <div class="d-flex align-items-center">
-                                                            <span id="new-monthly-gratuity" class="fw-bold">$0.00</span>
-                                                            <span id="monthly-gratuity-diff" class="ms-2 badge bg-success">+$0.00</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="col-md-6">
-                                                <h6 class="border-bottom pb-2 mb-3">
-                                                    <i class="fas fa-calendar-year me-1"></i> Annual Comparison
-                                                </h6>
-                                                
-                                                <div class="mb-3">
-                                                    <div class="d-flex justify-content-between mb-1">
-                                                        <small class="text-muted">Annual Gross Income:</small>
-                                                        <span id="new-annual-gross" class="fw-bold">$0.00</span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between mb-1">
-                                                        <small class="text-muted">Annual NIS Contribution:</small>
-                                                        <span id="new-annual-nis" class="fw-bold text-danger">$0.00</span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between mb-1">
-                                                        <small class="text-muted">Annual Tax Payable:</small>
-                                                        <span id="new-annual-tax" class="fw-bold text-danger">$0.00</span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between mb-1">
-                                                        <small class="text-muted">Annual Gratuity:</small>
-                                                        <span id="new-annual-gratuity" class="fw-bold text-success">$0.00</span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between fw-bold">
-                                                        <small>ANNUAL NET INCOME:</small>
-                                                        <div class="d-flex align-items-center">
-                                                            <span id="new-annual-income" class="fw-bold">$0.00</span>
-                                                            <span id="annual-income-diff" class="ms-2 badge bg-success">+$0.00</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <h6 class="border-bottom pb-2 mb-3 mt-2">
-                                            <i class="fas fa-gift me-1"></i> Special Payment Months
-                                        </h6>
-                                        
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h6 class="fw-bold text-primary">
-                                                    <i class="fas fa-calendar-alt me-2"></i>Month 6 Payment
-                                                </h6>
-                                                <div class="d-flex justify-content-between mb-1">
-                                                    <small class="text-muted">Regular Monthly Net Salary:</small>
-                                                    <span id="new-month-six-net" class="fw-bold">$0.00</span>
-                                                </div>
-                                                <div class="d-flex justify-content-between mb-1">
-                                                    <small class="text-muted">Gratuity Payment:</small>
-                                                    <span id="new-month-six-gratuity" class="fw-bold text-success">$0.00</span>
-                                                </div>
-                                                <div class="d-flex justify-content-between fw-bold">
-                                                    <small>MONTH 6 TOTAL PAYMENT:</small>
-                                                    <span id="new-month-six-total" class="fw-bold">$0.00</span>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="col-md-6">
-                                                <h6 class="fw-bold text-primary">
-                                                    <i class="fas fa-calendar-alt me-2"></i>Month 12 Payment
-                                                </h6>
-                                                <div class="d-flex justify-content-between mb-1">
-                                                    <small class="text-muted">Regular Monthly Net Salary:</small>
-                                                    <span id="new-month-twelve-net" class="fw-bold">$0.00</span>
-                                                </div>
-                                                <div class="d-flex justify-content-between mb-1">
-                                                    <small class="text-muted">Gratuity Payment:</small>
-                                                    <span class="result-value positive" id="new-month-twelve-gratuity">$0.00</span>
-                                                </div>
-                                                <div class="d-flex justify-content-between mb-1">
-                                                    <small class="text-muted">Vacation Allowance:</small>
-                                                    <span id="new-month-twelve-vacation" class="fw-bold text-success">$0.00</span>
-                                                </div>
-                                                <div class="d-flex justify-content-between fw-bold">
-                                                    <small>MONTH 12 TOTAL PAYMENT:</small>
-                                                    <span id="new-month-twelve-total">$0.00</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div id="retroactive-results-display" class="d-none mt-4">
-                                            <h6 class="border-bottom pb-2 mb-3">
-                                                <i class="fas fa-history me-1"></i> Retroactive Payment Details
-                                            </h6>
-                                            <div class="result-row">
-                                                <small class="result-label">Monthly Increase in Basic Pay:</small>
-                                                <span id="retro-monthly-increase" class="result-value positive">$0.00</span>
-                                            </div>
-                                            <div class="result-row">
-                                                <small class="result-label">Total Retroactive Lump Sum (Taxable):</small>
-                                                <span id="total-retro-lump-sum" class="result-value positive">$0.00</span>
-                                            </div>
-                                            <div class="result-row total-row">
-                                                <small class="result-label">NET PAY FOR RETROACTIVE MONTH (Lump Sum Included):</small>
-                                                <span id="net-pay-with-retro" class="result-value">$0.00</span>
-                                            </div>
-                                            <div class="form-text mt-2">
-                                                <i class="fas fa-info-circle me-1"></i>
-                                                This reflects your net pay for the month you receive the retroactive lump sum.
-                                            </div>
+                                    <div>
+                                        <strong class="text-primary">Month 12:</strong>
+                                        <div class="d-flex justify-content-between">
+                                            <small>Net + Gratuity + Vacation:</small>
+                                            <span id="result-month-twelve-total">$0.00</span>
                                         </div>
                                     </div>
                                 </div>
@@ -979,310 +1131,278 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Results Section -->
-            <div class="col-lg-5 results-section">
-                <!-- Monthly Results Card -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0">
-                            <i class="fas fa-chart-line"></i> Monthly Calculation Results
-                        </h5>
-                        <small class="text-muted">Your regular monthly salary breakdown</small>
+        <!-- SALARY INCREASE SIMULATOR SECTION (Full Width) -->
+        <hr class="section-divider" style="display: none;" id="simulator-divider">
+        
+        <div class="simulator-section" style="display: none;" id="salary-increase-section">
+            <div class="row align-items-center mb-3">
+                <div class="col-md-8">
+                    <h3><i class="fas fa-chart-line me-2"></i>Salary Increase Simulator</h3>
+                    <p class="mb-0">Simulate the impact of a potential salary increase on your take-home pay, gratuity benefits, and annual income.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <span class="badge bg-dark fs-6">
+                        <i class="fas fa-calculator me-1"></i> Advanced Calculator
+                    </span>
+                </div>
+            </div>
+
+            <div class="comparison-card">
+                <div class="row mb-3">
+                    <div class="col-md-4 mb-2">
+                        <label for="increase-percentage" class="form-label">
+                            <i class="fas fa-arrow-up me-1"></i> Increase Percentage
+                        </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="increase-percentage" value="6" min="0" max="100" step="0.1">
+                            <span class="input-group-text">%</span>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-dollar-sign me-1"></i> Basic Salary:
-                            </span>
-                            <span class="result-value" id="result-basic">$0.00</span>
-                        </div>
 
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-coins me-1"></i> Taxable Allowances:
-                            </span>
-                            <span class="result-value" id="result-taxable-allowances">$0.00</span>
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label d-block">
+                            <i class="fas fa-coins me-1"></i> Is the increase taxable?
+                        </label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="increase-taxable" id="increase-taxable-yes" value="yes" checked>
+                            <label class="form-check-label" for="increase-taxable-yes">
+                                <i class="fas fa-check me-1"></i> Yes, taxable
+                            </label>
                         </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-hand-holding-usd me-1"></i> Non-Taxable Allowances:
-                            </span>
-                            <span class="result-value" id="result-non-taxable-allowances">$0.00</span>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="increase-taxable" id="increase-taxable-no" value="no">
+                            <label class="form-check-label" for="increase-taxable-no">
+                                <i class="fas fa-times me-1"></i> No, non-taxable
+                            </label>
                         </div>
+                    </div>
 
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-money-bill-wave me-1"></i> Total Gross Income:
-                            </span>
-                            <span class="result-value" id="result-gross">$0.00</span>
+                    <div class="col-md-4">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="toggle-retroactive">
+                            <label class="form-check-label" for="toggle-retroactive">
+                                <i class="fas fa-history me-1"></i> Retroactive increase?
+                            </label>
                         </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-shield-alt me-1"></i> Personal Allowance (Free Pay):
-                            </span>
-                            <span class="result-value positive" id="result-personal-allowance">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-university me-1"></i> NIS Contribution:
-                            </span>
-                            <span class="result-value negative" id="result-nis">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-child me-1"></i> Child Allowance:
-                            </span>
-                            <span class="result-value positive" id="result-child">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-clock me-1"></i> Overtime Allowance (non-taxable):
-                            </span>
-                            <span class="result-value positive" id="result-overtime">$0.00</span>
-                        </div>
-
-                        <div class="result-row" id="second-job-result-row">
-                            <span class="result-label">
-                                <i class="fas fa-briefcase me-1"></i> Second Job Allowance (non-taxable):
-                            </span>
-                            <span class="result-value positive" id="result-second-job">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-shield-alt me-1"></i> Insurance Premium Deduction:
-                            </span>
-                            <span class="result-value positive" id="result-insurance">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-credit-card me-1"></i> Loan Deductions:
-                            </span>
-                            <span class="result-value negative" id="result-loan-deductions">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-university me-1"></i> Credit Union Deduction:
-                            </span>
-                            <span class="result-value negative" id="result-credit-union-deduction">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-calculator me-1"></i> Taxable Income:
-                            </span>
-                            <span class="result-value" id="result-taxable-income">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-percentage me-1"></i> Income Tax (25%/35%):
-                            </span>
-                            <span class="result-value negative" id="result-tax">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-gift me-1"></i> Monthly Gratuity Accrual:
-                            </span>
-                            <span class="result-value positive" id="result-monthly-gratuity">$0.00</span>
-                        </div>
-
-                        <div class="result-row total-row">
-                            <span class="result-label">
-                                <i class="fas fa-wallet me-1"></i> NET TAKE-HOME SALARY:
-                            </span>
-                            <span class="result-value" id="result-net">$0.00</span>
+                        <div id="retroactive-section" class="d-none">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="retroactive-months" value="1" min="1" max="12">
+                                <span class="input-group-text">Months</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Annual Projection Card -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0">
-                            <i class="fas fa-calendar-alt"></i> Annual Projection
-                        </h5>
-                        <small class="text-muted">Your total annual package breakdown</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-chart-bar me-1"></i> Annual Gross Income:
-                            </span>
-                            <span class="result-value" id="result-annual-gross">$0.00</span>
-                        </div>
+                <button id="calculate-increase-btn" class="btn btn-success btn-lg w-100">
+                    <i class="fas fa-percentage me-2"></i> Calculate With Salary Increase
+                </button>
 
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-university me-1"></i> Annual NIS Contribution:
-                            </span>
-                            <span class="result-value negative" id="result-annual-nis">$0.00</span>
+                <!-- Increase Results Display -->
+                <div id="increase-results" class="mt-4 d-none">
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-arrow-up me-2"></i>
+                                <h6 class="mb-0 fw-bold">Salary Increase Impact</h6>
+                            </div>
                         </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-percentage me-1"></i> Annual Tax Payable:
-                            </span>
-                            <span class="result-value negative" id="result-annual-tax">$0.00</span>
-                        </div>
-
-                        <div class="result-row">
-                            <span class="result-label">
-                                <i class="fas fa-gift me-1"></i> Annual Gratuity:
-                            </span>
-                            <span class="result-value positive" id="result-annual-gratuity">$0.00</span>
-                        </div>
-
-                        <div class="result-row total-row">
-                            <span class="result-label">
-                                <i class="fas fa-trophy me-1"></i> ANNUAL NET INCOME:
-                            </span>
-                            <span class="result-value" id="result-annual-net">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Special Payment Months Card -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0">
-                            <i class="fas fa-box-open"></i> Special Payment Months
-                        </h5>
-                        <small class="text-muted">Your enhanced payments with gratuity and vacation allowance</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <h6 class="fw-bold text-primary">
-                                <i class="fas fa-calendar-alt me-2"></i>Month 6 Payment
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="border-bottom pb-2 mb-3">
+                                        <i class="fas fa-calendar-week me-1"></i> Monthly Changes
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <small class="text-muted">Basic Salary:</small>
+                                            <div class="d-flex align-items-center">
+                                                <span id="new-basic-salary" class="fw-bold">$0.00</span>
+                                                <span id="basic-salary-diff" class="ms-2 badge bg-success">+$0.00</span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <small class="text-muted">Monthly Take-Home:</small>
+                                            <div class="d-flex align-items-center">
+                                                <span id="new-monthly-net" class="fw-bold">$0.00</span>
+                                                <span id="monthly-increase" class="ms-2 badge bg-success">+$0.00</span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <small class="text-muted">Monthly Gratuity Accrual:</small>
+                                            <div class="d-flex align-items-center">
+                                                <span id="new-monthly-gratuity" class="fw-bold">$0.00</span>
+                                                <span id="monthly-gratuity-diff" class="ms-2 badge bg-success">+$0.00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6 class="border-bottom pb-2 mb-3">
+                                        <i class="fas fa-calendar-year me-1"></i> Annual Changes
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <small class="text-muted">Annual Gross Income:</small>
+                                            <span id="new-annual-gross" class="fw-bold">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <small class="text-muted">Annual Tax Payable:</small>
+                                            <span id="new-annual-tax" class="fw-bold text-danger">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <small class="text-muted">Annual Gratuity:</small>
+                                            <span id="new-annual-gratuity" class="fw-bold text-success">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between fw-bold">
+                                            <small>ANNUAL NET INCOME:</small>
+                                            <div class="d-flex align-items-center">
+                                                <span id="new-annual-income" class="fw-bold">$0.00</span>
+                                                <span id="annual-income-diff" class="ms-2 badge bg-success">+$0.00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h6 class="border-bottom pb-2 mb-3 mt-2">
+                                <i class="fas fa-gift me-1"></i> Special Payment Months
                             </h6>
-                            <div class="result-row">
-                                <span class="result-label">Regular Monthly Net Salary:</span>
-                                <span class="result-value" id="result-month-six-net">$0.00</span>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold text-primary">
+                                        <i class="fas fa-calendar-alt me-2"></i>Month 6 Payment
+                                    </h6>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Regular Monthly Net Salary:</small>
+                                        <span id="new-month-six-net" class="fw-bold">$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Gratuity Payment:</small>
+                                        <span id="new-month-six-gratuity" class="fw-bold text-success">$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between fw-bold">
+                                        <small>MONTH 6 TOTAL PAYMENT:</small>
+                                        <span id="new-month-six-total" class="fw-bold">$0.00</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold text-primary">
+                                        <i class="fas fa-calendar-alt me-2"></i>Month 12 Payment
+                                    </h6>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Regular Monthly Net Salary:</small>
+                                        <span id="new-month-twelve-net" class="fw-bold">$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Gratuity Payment:</small>
+                                        <span class="result-value positive" id="new-month-twelve-gratuity">$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Vacation Allowance:</small>
+                                        <span id="new-month-twelve-vacation" class="fw-bold text-success">$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between fw-bold">
+                                        <small>MONTH 12 TOTAL PAYMENT:</small>
+                                        <span id="new-month-twelve-total">$0.00</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="result-row">
-                                <span class="result-label">Gratuity Payment (22.5% × 6 months):</span>
-                                <span class="result-value positive" id="result-month-six-gratuity">$0.00</span>
-                            </div>
-                            <div class="result-row total-row">
-                                <span class="result-label">MONTH 6 TOTAL PAYMENT:</span>
-                                <span class="result-value" id="result-month-six-total">$0.00</span>
+
+                            <div id="retroactive-results-display" class="d-none mt-4">
+                                <h6 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-history me-1"></i> Retroactive Payment Details
+                                </h6>
+                                <div class="result-row">
+                                    <small class="result-label">Monthly Increase in Basic Pay:</small>
+                                    <span id="retro-monthly-increase" class="result-value positive">$0.00</span>
+                                </div>
+                                <div class="result-row">
+                                    <small class="result-label">Total Retroactive Lump Sum (Taxable):</small>
+                                    <span id="total-retro-lump-sum" class="result-value positive">$0.00</span>
+                                </div>
+                                <div class="result-row total-row">
+                                    <small class="result-label">NET PAY FOR RETROACTIVE MONTH (Lump Sum Included):</small>
+                                    <span id="net-pay-with-retro" class="result-value">$0.00</span>
+                                </div>
+                                <div class="form-text mt-2">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    This reflects your net pay for the month you receive the retroactive lump sum.
+                                </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <div>
-                            <h6 class="fw-bold text-primary">
-                                <i class="fas fa-calendar-alt me-2"></i>Month 12 Payment
+        <!-- CHARTS SECTION (Full Width) -->
+        <hr class="section-divider" style="display: none;" id="charts-divider">
+        
+        <div class="charts-section" style="display: none;" id="charts-section">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="section-title mb-0">
+                                <i class="fas fa-chart-pie"></i> Income Breakdown
                             </h6>
-                            <div class="result-row">
-                                <span class="result-label">Regular Monthly Net Salary:</span>
-                                <span class="result-value" id="result-month-twelve-net">$0.00</span>
-                            </div>
-                            <div class="result-row">
-                                <span class="result-label">Gratuity Payment (22.5% × 6 months):</span>
-                                <span class="result-value positive" id="result-month-twelve-gratuity">$0.00</span>
-                            </div>
-                            <div class="result-row">
-                                <span class="result-label">Vacation Allowance:</span>
-                                <span class="result-value positive" id="result-month-twelve-vacation">$0.00</span>
-                            </div>
-                            <div class="result-row total-row">
-                                <span class="result-label">MONTH 12 TOTAL PAYMENT:</span>
-                                <span class="result-value" id="result-month-twelve-total">$0.00</span>
-                            </div>
                         </div>
-
-                        <div class="tax-info mt-4">
-                            <div class="tax-info-title">
-                                <i class="fas fa-info-circle me-2"></i> Payment Structure Information
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="income-chart"></canvas>
                             </div>
-                            <p class="mb-0 small">
-                                This calculator shows what you'll actually receive in your special payment months:
-                            </p>
-                            <ul class="mb-0 small mt-2">
-                                <li><strong>Month 6:</strong> Your regular net salary plus gratuity payment (accumulated at 22.5% of basic salary over 6 months)</li>
-                                <li><strong>Month 12:</strong> Your regular net salary plus gratuity payment plus annual vacation allowance</li>
-                                <li><strong>Regular Months:</strong> You receive only your regular monthly net salary (shown in the Monthly Results section)</li>
-                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Chart Cards -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0">
-                            <i class="fas fa-chart-pie"></i> Income Breakdown
-                        </h5>
-                        <small class="text-muted">Visual breakdown of your income components</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="income-chart"></canvas>
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="section-title mb-0">
+                                <i class="fas fa-chart-bar"></i> Tax Bracket Analysis
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="tax-chart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0">
-                            <i class="fas fa-chart-bar"></i> Tax Bracket Analysis
-                        </h5>
-                        <small class="text-muted">How your income is taxed across different brackets</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="tax-chart"></canvas>
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="section-title mb-0">
+                                <i class="fas fa-money-bill-wave"></i> Annual Cash Flow
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="cash-flow-chart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0">
-                            <i class="fas fa-money-bill-wave"></i> Annual Cash Flow
-                        </h5>
-                        <small class="text-muted">Your income throughout the year showing payment spikes</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="cash-flow-chart"></canvas>
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="section-title mb-0">
+                                <i class="fas fa-balance-scale"></i> Net vs. Gross Income
+                            </h6>
                         </div>
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0">
-                            <i class="fas fa-hand-holding-usd"></i> Tax Savings
-                        </h5>
-                        <small class="text-muted">How much you save through various deductions</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="tax-savings-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0">
-                            <i class="fas fa-balance-scale"></i> Net vs. Gross Income
-                        </h5>
-                        <small class="text-muted">Comparison of your gross income vs. take-home pay</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="net-vs-gross-chart"></canvas>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="net-vs-gross-chart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1325,5 +1445,49 @@
     <script src="js/calculator.js"></script>
     <script src="js/salary-increase.js"></script>
     <script src="js/main.js"></script>
+
+    <script>
+        // Updated UI handlers to show/hide sections properly
+        function showResultsSections() {
+            document.getElementById('results-summary').style.display = 'block';
+            document.getElementById('quick-stats').style.display = 'block';
+            document.getElementById('detailed-results').style.display = 'block';
+            document.getElementById('simulator-divider').style.display = 'block';
+            document.getElementById('salary-increase-section').style.display = 'block';
+            document.getElementById('charts-divider').style.display = 'block';
+            document.getElementById('charts-section').style.display = 'block';
+        }
+
+        // Update the existing calculateSalary function to use new layout
+        function updateSummaryDisplay(results) {
+            // Update summary cards
+            document.getElementById('summary-net-monthly').textContent = formatCurrency(results.monthlyNetSalary);
+            document.getElementById('summary-annual-net').textContent = formatCurrency(results.annualTotal);
+            document.getElementById('summary-month-six').textContent = formatCurrency(results.monthSixTotal);
+            document.getElementById('summary-month-twelve').textContent = formatCurrency(results.monthTwelveTotal);
+
+            // Update quick stats
+            const effectiveTaxRate = ((results.incomeTax / results.regularMonthlyGrossIncome) * 100) || 0;
+            const retentionRate = ((results.monthlyNetSalary / results.regularMonthlyGrossIncome) * 100) || 0;
+            
+            document.getElementById('stat-tax-rate').textContent = effectiveTaxRate.toFixed(1) + '%';
+            document.getElementById('stat-retention').textContent = retentionRate.toFixed(1) + '%';
+            document.getElementById('stat-gratuity').textContent = formatCurrency(results.monthlyGratuityAccrual);
+            document.getElementById('stat-nis').textContent = formatCurrency(results.nisContribution);
+
+            // Show all results sections
+            showResultsSections();
+        }
+
+        // Override the existing updateResultsDisplay function
+        const originalUpdateResultsDisplay = updateResultsDisplay;
+        updateResultsDisplay = function(results) {
+            // Call original function to populate detailed results
+            originalUpdateResultsDisplay(results);
+            
+            // Add summary display
+            updateSummaryDisplay(results);
+        };
+    </script>
 </body>
 </html>
