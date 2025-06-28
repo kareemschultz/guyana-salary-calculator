@@ -170,6 +170,9 @@
                         <span class="badge bg-light text-dark">
                             <i class="fas fa-shield-alt me-1"></i> NIS & Insurance
                         </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-calendar-week me-1"></i> Multiple Payment Frequencies
+                        </span>
                     </div>
                 </div>
                 <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
@@ -195,7 +198,7 @@
                 <h6 class="updates-banner-title">🎉 2025 Tax Year Updates</h6>
             </div>
             <p class="updates-banner-content">
-                <strong>Great news!</strong> Lower tax rates (25%/35%), higher personal allowance ($130,000 monthly), and new qualification allowances for degree holders are now in effect.
+                <strong>Great news!</strong> Lower tax rates (25%/35%), higher personal allowance ($130,000 monthly), new qualification allowances for degree holders, and support for multiple payment frequencies are now in effect.
             </p>
         </div>
 
@@ -306,17 +309,64 @@
                             </div>
                         </div>
 
+                        <!-- PAYMENT FREQUENCY ROW - NEW ADDITION -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="payment-frequency" class="form-label">
+                                    <i class="fas fa-calendar-week me-1"></i> Payment Frequency
+                                    <i class="fas fa-question-circle info-tooltip"
+                                       data-bs-toggle="tooltip"
+                                       title="How often you receive your salary. This affects tax calculations, allowances, and deductions according to GRA guidelines."></i>
+                                </label>
+                                <select id="payment-frequency" class="form-select">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="fortnightly">Fortnightly</option>
+                                    <option value="monthly" selected>Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i> 
+                                    All calculations will be adjusted for this frequency
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-calculator me-1"></i> Tax Calculation Preview
+                                </label>
+                                <div class="card border-info">
+                                    <div class="card-body p-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="text-muted">Personal Allowance:</small>
+                                            <span id="preview-personal-allowance" class="fw-bold text-success">$130,000</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="text-muted">Tax Threshold (25%):</small>
+                                            <span id="preview-tax-threshold" class="fw-bold text-primary">$260,000</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">NIS Ceiling:</small>
+                                            <span id="preview-nis-ceiling" class="fw-bold text-info">$280,000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BASIC SALARY ROW - UPDATED WITH DYNAMIC LABELS -->
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="basic-salary" class="form-label">
-                                    <i class="fas fa-dollar-sign me-1"></i> Basic Monthly Salary
+                                    <i class="fas fa-dollar-sign me-1"></i> <span id="basic-salary-label">Basic Monthly Salary</span>
                                     <i class="fas fa-question-circle info-tooltip"
                                        data-bs-toggle="tooltip"
-                                       title="Your base monthly salary before any allowances, bonuses, or deductions. This is used to calculate your gratuity at 22.5% per month."></i>
+                                       title="Your base salary before any allowances, bonuses, or deductions. This is used to calculate your gratuity at 22.5% per month."></i>
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text">GYD $</span>
                                     <input type="number" class="form-control" id="basic-salary" placeholder="e.g., 250,000">
+                                    <span class="input-group-text" id="salary-frequency-label">per month</span>
                                 </div>
                                 <div class="form-text">
                                     <i class="fas fa-info-circle me-1"></i> 
@@ -685,7 +735,7 @@
                                     <i class="fas fa-graduation-cap me-2"></i>
                                     <div>
                                         <strong>Qualification Allowance Applied:</strong>
-                                        <span id="qualification-allowance-amount">$0</span> monthly
+                                        <span id="qualification-allowance-amount">$0</span>
                                     </div>
                                 </div>
                             </div>
@@ -1462,7 +1512,7 @@
                     <i class="fas fa-code me-1"></i>
                     Built with ❤️ for Guyanese employees | 
                     <i class="fas fa-calendar-alt me-1"></i>
-                    Updated for 2025 Fiscal Year
+                    Updated for 2025 Fiscal Year with Payment Frequency Support
                 </small>
             </div>
         </div>
