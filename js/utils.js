@@ -8,6 +8,9 @@
  * @returns {string} Formatted currency string
  */
 function formatCurrency(amount) {
+    if (amount === undefined || amount === null || isNaN(amount)) {
+        return '$0.00';
+    }
     return '$' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
 
