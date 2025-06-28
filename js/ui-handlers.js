@@ -260,59 +260,65 @@ function calculateNonTaxableAllowancesTotal() {
 }
 
 /**
+ * Helper function to safely update element text content
+ * @param {string} elementId - The ID of the element to update
+ * @param {string} value - The value to set
+ */
+function safeUpdateElement(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value;
+    } else {
+        console.warn(`Element with ID '${elementId}' not found in DOM`);
+    }
+}
+
+/**
  * Update all result fields with calculation values
  * @param {Object} results - The calculation results
  */
 function updateResultsDisplay(results) {
-    // Regular monthly values
-    document.getElementById('result-basic').textContent = formatCurrency(results.basicSalary);
-    document.getElementById('result-taxable-allowances').textContent = formatCurrency(results.taxableAllowances);
-    document.getElementById('result-non-taxable-allowances').textContent = formatCurrency(results.nonTaxableAllowances);
-    document.getElementById('result-gross').textContent = formatCurrency(results.regularMonthlyGrossIncome);
-    document.getElementById('result-personal-allowance').textContent = formatCurrency(results.personalAllowance);
-    document.getElementById('result-nis').textContent = formatCurrency(results.nisContribution);
-    document.getElementById('result-child').textContent = formatCurrency(results.childAllowance);
-    document.getElementById('result-overtime').textContent = formatCurrency(results.overtimeAllowance);
-    document.getElementById('result-second-job').textContent = formatCurrency(results.secondJobAllowance);
-    document.getElementById('result-insurance').textContent = formatCurrency(results.actualInsuranceDeduction); // Use actual deducted amount
-    document.getElementById('result-loan-deductions').textContent = formatCurrency(results.loanPayment);
-    document.getElementById('result-credit-union-deduction').textContent = formatCurrency(results.creditUnionDeduction); // Updated ID and variable name
-    document.getElementById('result-taxable-income').textContent = formatCurrency(results.taxableIncome);
-    document.getElementById('result-tax').textContent = formatCurrency(results.incomeTax);
-    document.getElementById('result-monthly-gratuity').textContent = formatCurrency(results.monthlyGratuityAccrual);
-    document.getElementById('result-net').textContent = formatCurrency(results.monthlyNetSalary);
+    // Regular monthly values - use safe update for all elements
+    safeUpdateElement('result-basic', formatCurrency(results.basicSalary));
+    safeUpdateElement('result-taxable-allowances', formatCurrency(results.taxableAllowances));
+    safeUpdateElement('result-non-taxable-allowances', formatCurrency(results.nonTaxableAllowances));
+    safeUpdateElement('result-gross', formatCurrency(results.regularMonthlyGrossIncome));
+    safeUpdateElement('result-personal-allowance', formatCurrency(results.personalAllowance));
+    safeUpdateElement('result-nis', formatCurrency(results.nisContribution));
+    safeUpdateElement('result-child', formatCurrency(results.childAllowance));
+    safeUpdateElement('result-overtime', formatCurrency(results.overtimeAllowance));
+    safeUpdateElement('result-second-job', formatCurrency(results.secondJobAllowance));
+    safeUpdateElement('result-insurance', formatCurrency(results.actualInsuranceDeduction));
+    safeUpdateElement('result-loan-deductions', formatCurrency(results.loanPayment));
+    safeUpdateElement('result-credit-union-deduction', formatCurrency(results.creditUnionDeduction));
+    safeUpdateElement('result-taxable-income', formatCurrency(results.taxableIncome));
+    safeUpdateElement('result-tax', formatCurrency(results.incomeTax));
+    safeUpdateElement('result-monthly-gratuity', formatCurrency(results.monthlyGratuityAccrual));
+    safeUpdateElement('result-net', formatCurrency(results.monthlyNetSalary));
 
-    // If you added the qualification allowance row to the results display
-    if (document.getElementById('result-qualification-allowance')) {
-        document.getElementById('result-qualification-allowance').textContent = formatCurrency(results.qualificationAllowance);
-    }
+    // Qualification allowance (optional element)
+    safeUpdateElement('result-qualification-allowance', formatCurrency(results.qualificationAllowance));
 
     // Annual projections
-    document.getElementById('result-annual-gross').textContent = formatCurrency(results.annualGrossIncome);
-    document.getElementById('result-annual-nis').textContent = formatCurrency(results.annualNisContribution);
-    document.getElementById('result-annual-tax').textContent = formatCurrency(results.annualTaxPayable);
-    document.getElementById('result-annual-gratuity').textContent = formatCurrency(results.annualGratuityTotal);
-    document.getElementById('result-annual-net').textContent = formatCurrency(results.annualTotal);
+    safeUpdateElement('result-annual-gross', formatCurrency(results.annualGrossIncome));
+    safeUpdateElement('result-annual-tax', formatCurrency(results.annualTaxPayable));
+    safeUpdateElement('result-annual-gratuity', formatCurrency(results.annualGratuityTotal));
+    safeUpdateElement('result-annual-net', formatCurrency(results.annualTotal));
 
-    // Package breakdown - Month 6
-    document.getElementById('result-month-six-net').textContent = formatCurrency(results.monthlyNetSalary);
-    document.getElementById('result-month-six-gratuity').textContent = formatCurrency(results.sixMonthGratuity);
-    document.getElementById('result-month-six-total').textContent = formatCurrency(results.monthSixTotal);
-    
-    // Package breakdown - Month 12
-    document.getElementById('result-month-twelve-net').textContent = formatCurrency(results.monthlyNetSalary);
-    document.getElementById('result-month-twelve-gratuity').textContent = formatCurrency(results.sixMonthGratuity);
-    document.getElementById('result-month-twelve-vacation').textContent = formatCurrency(results.vacationAllowance);
-    document.getElementById('result-month-twelve-total').textContent = formatCurrency(results.monthTwelveTotal);
+    // Special month totals (only these exist in the current HTML)
+    safeUpdateElement('result-month-six-total', formatCurrency(results.monthSixTotal));
+    safeUpdateElement('result-month-twelve-total', formatCurrency(results.monthTwelveTotal));
 
     // Show/hide second job row
     const secondJobResultRow = document.getElementById('second-job-result-row');
-    if (results.secondJobIncome > 0 || 
-        (document.getElementById('second-job-section') && 
-         !document.getElementById('second-job-section').classList.contains('d-none'))) {
-        secondJobResultRow.classList.remove('d-none');
-    } else {
-        secondJobResultRow.classList.add('d-none');
+    if (secondJobResultRow) {
+        if (results.secondJobIncome > 0 || 
+            (document.getElementById('second-job-section') && 
+             !document.getElementById('second-job-section').classList.contains('d-none'))) {
+            secondJobResultRow.classList.remove('d-none');
+        } else {
+            secondJobResultRow.classList.add('d-none');
+        }
     }
 
     // Create charts
