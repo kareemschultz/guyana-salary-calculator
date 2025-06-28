@@ -1,5 +1,5 @@
 /**
- * Salary Increase Calculator Functions
+ * Salary Increase Calculator Functions - FIXED VERSION
  */
 
 /**
@@ -8,23 +8,23 @@
 function showSalaryIncreaseSection() {
     const salaryIncreaseSection = document.getElementById('salary-increase-section');
     if (salaryIncreaseSection) {
-        salaryIncreaseSection.classList.remove('d-none');
+        salaryIncreaseSection.style.display = 'block';
     }
 
-    // Setup listener for retroactive toggle
+    // Setup listener for retroactive toggle if not already set up
     const toggleRetroactive = document.getElementById('toggle-retroactive');
-    if (toggleRetroactive) {
+    if (toggleRetroactive && !toggleRetroactive.hasAttribute('data-listener-added')) {
         toggleRetroactive.addEventListener('change', function() {
             const retroactiveSection = document.getElementById('retroactive-section');
             const retroactiveResultsDisplay = document.getElementById('retroactive-results-display');
             if (this.checked) {
-                retroactiveSection.classList.remove('d-none');
-                retroactiveResultsDisplay.classList.remove('d-none');
+                if (retroactiveSection) retroactiveSection.classList.remove('d-none');
             } else {
-                retroactiveSection.classList.add('d-none');
-                retroactiveResultsDisplay.classList.add('d-none');
+                if (retroactiveSection) retroactiveSection.classList.add('d-none');
+                if (retroactiveResultsDisplay) retroactiveResultsDisplay.classList.add('d-none');
             }
         });
+        toggleRetroactive.setAttribute('data-listener-added', 'true');
     }
 }
 
@@ -43,12 +43,18 @@ function calculateWithIncrease() {
         }
         
         // Get increase parameters
-        const increasePercentage = parseFloat(document.getElementById('increase-percentage').value) || 0;
-        const isTaxable = document.querySelector('input[name="increase-taxable"]:checked').value === 'yes';
+        const increasePercentageElement = document.getElementById('increase-percentage');
+        const increasePercentage = increasePercentageElement ? (parseFloat(increasePercentageElement.value) || 0) : 0;
+        
+        const increaseTaxableElement = document.querySelector('input[name="increase-taxable"]:checked');
+        const isTaxable = increaseTaxableElement ? increaseTaxableElement.value === 'yes' : true;
         
         // Get retroactive parameters
-        const isRetroactive = document.getElementById('toggle-retroactive').checked;
-        const retroactiveMonths = isRetroactive ? (parseInt(document.getElementById('retroactive-months').value) || 0) : 0;
+        const toggleRetroactiveElement = document.getElementById('toggle-retroactive');
+        const isRetroactive = toggleRetroactiveElement ? toggleRetroactiveElement.checked : false;
+        
+        const retroactiveMonthsElement = document.getElementById('retroactive-months');
+        const retroactiveMonths = isRetroactive && retroactiveMonthsElement ? (parseInt(retroactiveMonthsElement.value) || 0) : 0;
 
         // Calculate new values
         const results = calculateIncreaseResults(lastResults, increasePercentage, isTaxable, retroactiveMonths);
@@ -139,7 +145,7 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
                                   newResults.nisContribution -
                                   newResults.incomeTax -
                                   newResults.loanPayment -
-                                  newResults.creditUnionDeduction; // Renamed for clarity
+                                  newResults.creditUnionDeduction;
 
     // --- Retroactive Calculation ---
     newResults.retroactiveMonthlyIncrease = 0;
@@ -147,13 +153,10 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
     newResults.netPayWithRetroactiveLumpSum = 0;
 
     if (retroactiveMonths > 0) {
-        newResults.retroactiveMonthlyIncrease = monthlyBasicIncreaseAmount; // The increase per month
-        newResults.totalRetroactiveLumpSum = monthlyBasicIncreaseAmount * retroactiveMonths; // Total lump sum
+        newResults.retroactiveMonthlyIncrease = monthlyBasicIncreaseAmount;
+        newResults.totalRetroactiveLumpSum = monthlyBasicIncreaseAmount * retroactiveMonths;
 
-        // To calculate net pay for the retroactive month, we need to apply tax on the lump sum
-        // This means calculating tax for a hypothetical month where this lump sum is added to gross.
-        
-        // Hypothetical gross for the retroactive payment month (full new monthly gross + lump sum)
+        // To calculate net pay for the retroactive month
         const grossForRetroMonth = newResults.regularMonthlyGrossIncome + newResults.totalRetroactiveLumpSum;
 
         // Recalculate PA/NIS based on this temporarily inflated gross for retro month
@@ -181,14 +184,14 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
         newResults.netPayWithRetroactiveLumpSum = grossForRetroMonth - retroNisContribution - retroIncomeTax - newResults.loanPayment - newResults.creditUnionDeduction;
     }
 
-    // Recalculate annual figures based on new monthly net salary (already includes deductions)
+    // Recalculate annual figures based on new monthly net salary
     newResults.annualGrossIncome = newResults.regularMonthlyGrossIncome * 12;
     newResults.annualNisContribution = newResults.nisContribution * 12;
     newResults.annualTaxPayable = newResults.incomeTax * 12;
     newResults.annualGratuityTotal = newResults.sixMonthGratuity * 2;
     
-    // Recalculate annual total (without retroactive, that's added separately if applicable)
-    newResults.annualTotal = (newResults.monthlyNetSalary * 12) + newResults.annualGratuityTotal + newResults.vacationAllowance;
+    // Recalculate annual total
+    newResults.annualTotal = (newResults.monthlyNetSalary * 12) + newResults.annualGratuityTotal + (newResults.vacationAllowance || 0);
     
     // Add retroactive lump sum to annual total if applicable
     if (retroactiveMonths > 0) {
@@ -197,7 +200,7 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
     
     // Recalculate special month totals
     newResults.monthSixTotal = newResults.monthlyNetSalary + newResults.sixMonthGratuity;
-    newResults.monthTwelveTotal = newResults.monthlyNetSalary + newResults.sixMonthGratuity + newResults.vacationAllowance;
+    newResults.monthTwelveTotal = newResults.monthlyNetSalary + newResults.sixMonthGratuity + (newResults.vacationAllowance || 0);
 
     // Calculate difference values for display
     newResults.basicSalaryDifference = newResults.basicSalary - baseResults.basicSalary;
@@ -209,62 +212,104 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
 }
 
 /**
+ * CRITICAL: Safe helper function to update salary increase elements
+ * This prevents "Cannot set properties of null" errors
+ * @param {string} elementId - The ID of the element to update
+ * @param {string} value - The value to set
+ */
+function safeUpdateIncreaseElement(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value;
+        return true;
+    } else {
+        // Only warn for critical elements, silently skip optional ones
+        const criticalElements = [
+            'new-basic-salary', 'new-monthly-net', 'new-monthly-gratuity',
+            'new-annual-gross', 'new-annual-income'
+        ];
+        if (criticalElements.includes(elementId)) {
+            console.warn(`Critical salary increase element '${elementId}' not found in DOM`);
+        }
+        return false;
+    }
+}
+
+/**
  * Display the salary increase calculation results
  * @param {Object} results - The new calculation results
  * @param {Object} baseResults - The original calculation results
  * @param {boolean} isRetroactive - Whether retroactive pay was calculated
  */
 function updateIncreaseResultsDisplay(results, baseResults, isRetroactive) {
-    const increaseResults = document.getElementById('increase-results');
-    if (increaseResults) {
-        increaseResults.classList.remove('d-none');
-    }
-    
-    // Helper function to safely format currency
-    const safeCurrency = (amount) => {
-        if (amount === undefined || amount === null || isNaN(amount)) {
-            return '$0.00';
+    try {
+        const increaseResults = document.getElementById('increase-results');
+        if (increaseResults) {
+            increaseResults.classList.remove('d-none');
         }
-        return '$' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-    };
-    
-    // Monthly Comparison
-    document.getElementById('new-basic-salary').textContent = safeCurrency(results.basicSalary);
-    document.getElementById('basic-salary-diff').textContent = '+' + safeCurrency(results.basicSalaryDifference);
-    
-    document.getElementById('new-monthly-net').textContent = safeCurrency(results.monthlyNetSalary);
-    document.getElementById('monthly-increase').textContent = '+' + safeCurrency(results.monthlyNetDifference);
-    
-    document.getElementById('new-monthly-gratuity').textContent = safeCurrency(results.monthlyGratuityAccrual);
-    document.getElementById('monthly-gratuity-diff').textContent = '+' + safeCurrency(results.monthlyGratuityDifference);
-    
-    // Annual Comparison
-    document.getElementById('new-annual-gross').textContent = safeCurrency(results.annualGrossIncome);
-    document.getElementById('new-annual-nis').textContent = safeCurrency(results.annualNisContribution);
-    document.getElementById('new-annual-tax').textContent = safeCurrency(results.annualTaxPayable);
-    document.getElementById('new-annual-gratuity').textContent = safeCurrency(results.annualGratuityTotal);
-    document.getElementById('new-annual-income').textContent = safeCurrency(results.annualTotal);
-    document.getElementById('annual-income-diff').textContent = '+' + safeCurrency(results.annualNetDifference);
-    
-    // Special Payment Months - Month 6
-    document.getElementById('new-month-six-net').textContent = safeCurrency(results.monthlyNetSalary);
-    document.getElementById('new-month-six-gratuity').textContent = safeCurrency(results.sixMonthGratuity);
-    document.getElementById('new-month-six-total').textContent = safeCurrency(results.monthSixTotal);
-    
-    // Special Payment Months - Month 12
-    document.getElementById('new-month-twelve-net').textContent = safeCurrency(results.monthlyNetSalary);
-    document.getElementById('new-month-twelve-gratuity').textContent = safeCurrency(results.sixMonthGratuity);
-    document.getElementById('new-month-twelve-vacation').textContent = safeCurrency(results.vacationAllowance);
-    document.getElementById('new-month-twelve-total').textContent = safeCurrency(results.monthTwelveTotal);
+        
+        // Helper function to safely format currency
+        const safeCurrency = (amount) => {
+            if (amount === undefined || amount === null || isNaN(amount)) {
+                return '$0.00';
+            }
+            return '$' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        };
+        
+        // Monthly Comparison - SAFE UPDATES
+        safeUpdateIncreaseElement('new-basic-salary', safeCurrency(results.basicSalary));
+        safeUpdateIncreaseElement('basic-salary-diff', '+' + safeCurrency(results.basicSalaryDifference || 0));
+        
+        safeUpdateIncreaseElement('new-monthly-net', safeCurrency(results.monthlyNetSalary));
+        safeUpdateIncreaseElement('monthly-increase', '+' + safeCurrency(results.monthlyNetDifference || 0));
+        
+        safeUpdateIncreaseElement('new-monthly-gratuity', safeCurrency(results.monthlyGratuityAccrual));
+        safeUpdateIncreaseElement('monthly-gratuity-diff', '+' + safeCurrency(results.monthlyGratuityDifference || 0));
+        
+        // Annual Comparison - SAFE UPDATES
+        safeUpdateIncreaseElement('new-annual-gross', safeCurrency(results.annualGrossIncome));
+        safeUpdateIncreaseElement('new-annual-tax', safeCurrency(results.annualTaxPayable));
+        safeUpdateIncreaseElement('new-annual-gratuity', safeCurrency(results.annualGratuityTotal));
+        safeUpdateIncreaseElement('new-annual-income', safeCurrency(results.annualTotal));
+        safeUpdateIncreaseElement('annual-income-diff', '+' + safeCurrency(results.annualNetDifference || 0));
+        
+        // Special Payment Months - Month 6 - SAFE UPDATES
+        safeUpdateIncreaseElement('new-month-six-net', safeCurrency(results.monthlyNetSalary));
+        safeUpdateIncreaseElement('new-month-six-gratuity', safeCurrency(results.sixMonthGratuity));
+        safeUpdateIncreaseElement('new-month-six-total', safeCurrency(results.monthSixTotal));
+        
+        // Special Payment Months - Month 12 - SAFE UPDATES
+        safeUpdateIncreaseElement('new-month-twelve-net', safeCurrency(results.monthlyNetSalary));
+        safeUpdateIncreaseElement('new-month-twelve-gratuity', safeCurrency(results.sixMonthGratuity));
+        safeUpdateIncreaseElement('new-month-twelve-vacation', safeCurrency(results.vacationAllowance || 0));
+        safeUpdateIncreaseElement('new-month-twelve-total', safeCurrency(results.monthTwelveTotal));
 
-    // Retroactive Results Display
-    const retroactiveResultsDisplay = document.getElementById('retroactive-results-display');
-    if (isRetroactive && results.totalRetroactiveLumpSum > 0) {
-        retroactiveResultsDisplay.classList.remove('d-none');
-        document.getElementById('retro-monthly-increase').textContent = safeCurrency(results.retroactiveMonthlyIncrease);
-        document.getElementById('total-retro-lump-sum').textContent = safeCurrency(results.totalRetroactiveLumpSum);
-        document.getElementById('net-pay-with-retro').textContent = safeCurrency(results.netPayWithRetroactiveLumpSum);
-    } else {
-        retroactiveResultsDisplay.classList.add('d-none');
+        // Retroactive Results Display - SAFE UPDATES
+        const retroactiveResultsDisplay = document.getElementById('retroactive-results-display');
+        if (isRetroactive && results.totalRetroactiveLumpSum > 0) {
+            if (retroactiveResultsDisplay) {
+                retroactiveResultsDisplay.classList.remove('d-none');
+            }
+            safeUpdateIncreaseElement('retro-monthly-increase', safeCurrency(results.retroactiveMonthlyIncrease || 0));
+            safeUpdateIncreaseElement('total-retro-lump-sum', safeCurrency(results.totalRetroactiveLumpSum || 0));
+            safeUpdateIncreaseElement('net-pay-with-retro', safeCurrency(results.netPayWithRetroactiveLumpSum || 0));
+        } else {
+            if (retroactiveResultsDisplay) {
+                retroactiveResultsDisplay.classList.add('d-none');
+            }
+        }
+        
+        console.log('Salary increase display updated successfully');
+        
+    } catch (error) {
+        console.error('Error in salary increase display:', error);
+        // Don't crash the application, just log the error
+        console.log('Salary increase calculation completed despite display errors');
+        
+        // Show a user-friendly message that calculation worked
+        const increaseResults = document.getElementById('increase-results');
+        if (increaseResults) {
+            increaseResults.classList.remove('d-none');
+        }
     }
 }
