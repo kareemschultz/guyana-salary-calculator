@@ -86,9 +86,8 @@ const POSITION_PRESETS = {
     },
     'ict-eng-3': {
         title: 'ICT Engineer III',
-        baseSalary: 370000,
+        baseSalary: 393301,
         taxableAllowances: {
-            duty: 80000,
             uniform: 5000
         },
         nonTaxableAllowances: {
