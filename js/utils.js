@@ -1,5 +1,5 @@
 /**
- * Utility functions for the calculator
+ * Utility functions for the calculator - Updated with Payment Frequency Support
  */
 
 /**
@@ -155,7 +155,7 @@ function updateChartsTheme() {
 }
 
 /**
- * Apply a position preset to the form
+ * Apply a position preset to the form with frequency conversion support
  * @param {string} presetId - The ID of the preset to apply
  */
 function applyPositionPreset(presetId) {
@@ -165,11 +165,16 @@ function applyPositionPreset(presetId) {
     }
     
     const preset = POSITION_PRESETS[presetId];
-    debug('Applying position preset', preset);
+    const frequencyConfig = getFrequencyConfig();
+    debug('Applying position preset with frequency conversion', { preset, frequencyConfig });
     
-    // We don't need to set the position anymore as the dropdown handles it
-    // Set job title and salary
-    document.getElementById('basic-salary').value = preset.baseSalary;
+    // Convert monthly preset values to current frequency
+    const basicSalaryForFrequency = convertFromMonthly(preset.baseSalary);
+    const totalTaxableForFrequency = convertFromMonthly(preset.totalTaxableAllowances);
+    const totalNonTaxableForFrequency = convertFromMonthly(preset.totalNonTaxableAllowances);
+    
+    // Set the converted basic salary
+    document.getElementById('basic-salary').value = Math.round(basicSalaryForFrequency);
     
     // Calculate gross salary for vacation allowance
     const grossSalary = preset.baseSalary + preset.totalTaxableAllowances + preset.totalNonTaxableAllowances;
@@ -198,7 +203,7 @@ function applyPositionPreset(presetId) {
             }
             
             if (text) {
-                text.textContent = 'Show Single';
+                text.textContent = 'Enter Total Taxable Allowances';
             }
         }
     }
@@ -226,49 +231,49 @@ function applyPositionPreset(presetId) {
             }
             
             if (text) {
-                text.textContent = 'Show Single';
+                text.textContent = 'Enter Total Non-Taxable Allowances';
             }
         }
     }
     
     // Now populate the fields based on the current visibility state
     
-    // Set taxable allowances
+    // Set taxable allowances with frequency conversion
     if (!taxableMultipleSection.classList.contains('d-none')) {
-        // Multiple section is now visible, populate individual fields
-        document.getElementById('duty-allowance').value = preset.taxableAllowances.duty || '';
-        document.getElementById('uniform-allowance').value = preset.taxableAllowances.uniform || '';
-        document.getElementById('housing-allowance').value = preset.taxableAllowances.housing || '';
-        document.getElementById('acting-allowance').value = preset.taxableAllowances.acting || '';
-        document.getElementById('meal-allowance').value = preset.taxableAllowances.meal || '';
-        document.getElementById('saving-scheme').value = preset.taxableAllowances.saving || '';
+        // Multiple section is now visible, populate individual fields with converted values
+        document.getElementById('duty-allowance').value = Math.round(convertFromMonthly(preset.taxableAllowances.duty || 0));
+        document.getElementById('uniform-allowance').value = Math.round(convertFromMonthly(preset.taxableAllowances.uniform || 0));
+        document.getElementById('housing-allowance').value = Math.round(convertFromMonthly(preset.taxableAllowances.housing || 0));
+        document.getElementById('acting-allowance').value = Math.round(convertFromMonthly(preset.taxableAllowances.acting || 0));
+        document.getElementById('meal-allowance').value = Math.round(convertFromMonthly(preset.taxableAllowances.meal || 0));
+        document.getElementById('saving-scheme').value = Math.round(convertFromMonthly(preset.taxableAllowances.saving || 0));
         document.getElementById('other-taxable').value = '';
         
         // Calculate totals
         calculateTaxableAllowancesTotal();
     } else {
         // Single section is visible
-        document.getElementById('taxable-allowances').value = preset.totalTaxableAllowances;
+        document.getElementById('taxable-allowances').value = Math.round(totalTaxableForFrequency);
     }
     
-    // Set non-taxable allowances
+    // Set non-taxable allowances with frequency conversion
     if (!nonTaxableMultipleSection.classList.contains('d-none')) {
-        // Multiple section is now visible, populate individual fields
-        document.getElementById('travel-allowance').value = preset.nonTaxableAllowances.travel || '';
-        document.getElementById('telecom-allowance').value = preset.nonTaxableAllowances.telecom || '';
-        document.getElementById('entertainment-allowance').value = preset.nonTaxableAllowances.entertainment || '';
+        // Multiple section is now visible, populate individual fields with converted values
+        document.getElementById('travel-allowance').value = Math.round(convertFromMonthly(preset.nonTaxableAllowances.travel || 0));
+        document.getElementById('telecom-allowance').value = Math.round(convertFromMonthly(preset.nonTaxableAllowances.telecom || 0));
+        document.getElementById('entertainment-allowance').value = Math.round(convertFromMonthly(preset.nonTaxableAllowances.entertainment || 0));
         document.getElementById('station-allowance').value = '';
         document.getElementById('subsistence-allowance').value = '';
         document.getElementById('laundry-allowance').value = '';
         document.getElementById('other-non-taxable').value = '';
         
-        // Set vacation allowance to gross salary
+        // Set vacation allowance (keep as annual lump sum)
         document.getElementById('vacation-allowance').value = grossSalary;
         
         // Calculate totals
         calculateNonTaxableAllowancesTotal();
     } else {
         // Single section is visible
-        document.getElementById('non-taxable-allowances').value = preset.totalNonTaxableAllowances;
+        document.getElementById('non-taxable-allowances').value = Math.round(totalNonTaxableForFrequency);
     }
 }
