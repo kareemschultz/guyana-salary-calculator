@@ -125,6 +125,57 @@ body {
     margin-bottom: 0.5rem;
 }
 
+/* BADGE FIXES FOR APP HEADER */
+
+/* Light mode badges */
+.app-header .badge.bg-light {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    color: #1e40af !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    font-weight: 500;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+/* Dark mode badges */
+[data-theme="dark"] .app-header .badge.bg-light {
+    background-color: rgba(30, 41, 59, 0.95) !important;
+    color: #93c5fd !important;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+/* Success badge fixes */
+.app-header .badge.bg-success {
+    background-color: #059669 !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+[data-theme="dark"] .app-header .badge.bg-success {
+    background-color: #34d399 !important;
+    color: #064e3b !important;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+/* Ensure badge icons have proper colors */
+.app-header .badge i {
+    color: inherit !important;
+}
+
+/* Badge hover effects */
+.app-header .badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .app-header .badge:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 /* Info Cards Styles */
 .info-cards-section {
     margin-bottom: 2rem;
