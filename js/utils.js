@@ -1,5 +1,5 @@
 /**
- * Utility functions for the calculator - Updated with Payment Frequency Support
+ * Utility functions for the calculator - Updated with Payment Frequency Support and Dark Mode Default
  */
 
 /**
@@ -76,11 +76,13 @@ function toggleDarkMode(darkMode) {
 }
 
 /**
- * Initialize theme based on stored preference
+ * Initialize theme based on stored preference - DEFAULTS TO DARK MODE
  */
 function initializeTheme() {
     const savedTheme = localStorage.getItem('theme');
-    const isDark = savedTheme === 'dark';
+    
+    // Default to dark mode if no preference is saved
+    const isDark = savedTheme === null ? true : savedTheme === 'dark';
     
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
     
@@ -88,6 +90,8 @@ function initializeTheme() {
     if (themeToggle) {
         themeToggle.checked = isDark;
     }
+    
+    debug('Theme initialized', { savedTheme, isDark });
 }
 
 /**
@@ -115,8 +119,10 @@ function updateChartsTheme() {
     const theme = isDark ? chartColors.dark : chartColors.light;
     
     // Update Chart.js defaults
-    Chart.defaults.color = theme.textColor;
-    Chart.defaults.scale.grid.color = theme.gridColor;
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.color = theme.textColor;
+        Chart.defaults.scale.grid.color = theme.gridColor;
+    }
     
     // Redraw existing charts with new theme if they exist
     if (typeof incomeChart !== 'undefined' && incomeChart) {
