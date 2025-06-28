@@ -179,19 +179,31 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
 
         // Calculate Net Pay for the retroactive payment month
         newResults.netPayWithRetroactiveLumpSum = grossForRetroMonth - retroNisContribution - retroIncomeTax - newResults.loanPayment - newResults.creditUnionDeduction;
-        
-        // Add the total retroactive lump sum to the annual total, as it's a one-time payment.
-        newResults.annualTotal += newResults.totalRetroactiveLumpSum;
     }
-
 
     // Recalculate annual figures based on new monthly net salary (already includes deductions)
     newResults.annualGrossIncome = newResults.regularMonthlyGrossIncome * 12;
     newResults.annualNisContribution = newResults.nisContribution * 12;
     newResults.annualTaxPayable = newResults.incomeTax * 12;
     newResults.annualGratuityTotal = newResults.sixMonthGratuity * 2;
-    // newResults.annualTotal already updated with retroactive lump sum if applicable
+    
+    // Recalculate annual total (without retroactive, that's added separately if applicable)
+    newResults.annualTotal = (newResults.monthlyNetSalary * 12) + newResults.annualGratuityTotal + newResults.vacationAllowance;
+    
+    // Add retroactive lump sum to annual total if applicable
+    if (retroactiveMonths > 0) {
+        newResults.annualTotal += newResults.totalRetroactiveLumpSum;
+    }
+    
+    // Recalculate special month totals
+    newResults.monthSixTotal = newResults.monthlyNetSalary + newResults.sixMonthGratuity;
+    newResults.monthTwelveTotal = newResults.monthlyNetSalary + newResults.sixMonthGratuity + newResults.vacationAllowance;
 
+    // Calculate difference values for display
+    newResults.basicSalaryDifference = newResults.basicSalary - baseResults.basicSalary;
+    newResults.monthlyNetDifference = newResults.monthlyNetSalary - baseResults.monthlyNetSalary;
+    newResults.monthlyGratuityDifference = newResults.monthlyGratuityAccrual - baseResults.monthlyGratuityAccrual;
+    newResults.annualNetDifference = newResults.annualTotal - baseResults.annualTotal;
 
     return newResults;
 }
@@ -208,42 +220,50 @@ function updateIncreaseResultsDisplay(results, baseResults, isRetroactive) {
         increaseResults.classList.remove('d-none');
     }
     
+    // Helper function to safely format currency
+    const safeCurrency = (amount) => {
+        if (amount === undefined || amount === null || isNaN(amount)) {
+            return '$0.00';
+        }
+        return '$' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    };
+    
     // Monthly Comparison
-    document.getElementById('new-basic-salary').textContent = formatCurrency(results.basicSalary);
-    document.getElementById('basic-salary-diff').textContent = '+' + formatCurrency(results.basicSalaryDifference);
+    document.getElementById('new-basic-salary').textContent = safeCurrency(results.basicSalary);
+    document.getElementById('basic-salary-diff').textContent = '+' + safeCurrency(results.basicSalaryDifference);
     
-    document.getElementById('new-monthly-net').textContent = formatCurrency(results.monthlyNetSalary);
-    document.getElementById('monthly-increase').textContent = '+' + formatCurrency(results.monthlyNetDifference);
+    document.getElementById('new-monthly-net').textContent = safeCurrency(results.monthlyNetSalary);
+    document.getElementById('monthly-increase').textContent = '+' + safeCurrency(results.monthlyNetDifference);
     
-    document.getElementById('new-monthly-gratuity').textContent = formatCurrency(results.monthlyGratuityAccrual);
-    document.getElementById('monthly-gratuity-diff').textContent = '+' + formatCurrency(results.monthlyGratuityDifference);
+    document.getElementById('new-monthly-gratuity').textContent = safeCurrency(results.monthlyGratuityAccrual);
+    document.getElementById('monthly-gratuity-diff').textContent = '+' + safeCurrency(results.monthlyGratuityDifference);
     
     // Annual Comparison
-    document.getElementById('new-annual-gross').textContent = formatCurrency(results.annualGrossIncome);
-    document.getElementById('new-annual-nis').textContent = formatCurrency(results.annualNisContribution);
-    document.getElementById('new-annual-tax').textContent = formatCurrency(results.annualTaxPayable);
-    document.getElementById('new-annual-gratuity').textContent = formatCurrency(results.annualGratuityTotal);
-    document.getElementById('new-annual-income').textContent = formatCurrency(results.annualTotal);
-    document.getElementById('annual-income-diff').textContent = '+' + formatCurrency(results.annualNetDifference);
+    document.getElementById('new-annual-gross').textContent = safeCurrency(results.annualGrossIncome);
+    document.getElementById('new-annual-nis').textContent = safeCurrency(results.annualNisContribution);
+    document.getElementById('new-annual-tax').textContent = safeCurrency(results.annualTaxPayable);
+    document.getElementById('new-annual-gratuity').textContent = safeCurrency(results.annualGratuityTotal);
+    document.getElementById('new-annual-income').textContent = safeCurrency(results.annualTotal);
+    document.getElementById('annual-income-diff').textContent = '+' + safeCurrency(results.annualNetDifference);
     
     // Special Payment Months - Month 6
-    document.getElementById('new-month-six-net').textContent = formatCurrency(results.monthlyNetSalary);
-    document.getElementById('new-month-six-gratuity').textContent = formatCurrency(results.sixMonthGratuity);
-    document.getElementById('new-month-six-total').textContent = formatCurrency(results.monthSixTotal);
+    document.getElementById('new-month-six-net').textContent = safeCurrency(results.monthlyNetSalary);
+    document.getElementById('new-month-six-gratuity').textContent = safeCurrency(results.sixMonthGratuity);
+    document.getElementById('new-month-six-total').textContent = safeCurrency(results.monthSixTotal);
     
     // Special Payment Months - Month 12
-    document.getElementById('new-month-twelve-net').textContent = formatCurrency(results.monthlyNetSalary);
-    document.getElementById('new-month-twelve-gratuity').textContent = formatCurrency(results.sixMonthGratuity);
-    document.getElementById('new-month-twelve-vacation').textContent = formatCurrency(results.vacationAllowance);
-    document.getElementById('new-month-twelve-total').textContent = formatCurrency(results.monthTwelveTotal);
+    document.getElementById('new-month-twelve-net').textContent = safeCurrency(results.monthlyNetSalary);
+    document.getElementById('new-month-twelve-gratuity').textContent = safeCurrency(results.sixMonthGratuity);
+    document.getElementById('new-month-twelve-vacation').textContent = safeCurrency(results.vacationAllowance);
+    document.getElementById('new-month-twelve-total').textContent = safeCurrency(results.monthTwelveTotal);
 
     // Retroactive Results Display
     const retroactiveResultsDisplay = document.getElementById('retroactive-results-display');
     if (isRetroactive && results.totalRetroactiveLumpSum > 0) {
         retroactiveResultsDisplay.classList.remove('d-none');
-        document.getElementById('retro-monthly-increase').textContent = formatCurrency(results.retroactiveMonthlyIncrease);
-        document.getElementById('total-retro-lump-sum').textContent = formatCurrency(results.totalRetroactiveLumpSum);
-        document.getElementById('net-pay-with-retro').textContent = formatCurrency(results.netPayWithRetroactiveLumpSum);
+        document.getElementById('retro-monthly-increase').textContent = safeCurrency(results.retroactiveMonthlyIncrease);
+        document.getElementById('total-retro-lump-sum').textContent = safeCurrency(results.totalRetroactiveLumpSum);
+        document.getElementById('net-pay-with-retro').textContent = safeCurrency(results.netPayWithRetroactiveLumpSum);
     } else {
         retroactiveResultsDisplay.classList.add('d-none');
     }
