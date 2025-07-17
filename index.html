@@ -325,11 +325,16 @@
                                 </label>
                                 <select id="position-select" class="form-select">
                                     <option value="other" selected>Other (Type custom position)</option>
+                                    <option value="it-officer-2">IT Officer II</option>
                                     <option value="ict-tech-1">ICT Technician I</option>
                                     <option value="ict-tech-2">ICT Technician II</option>
                                     <option value="ict-tech-3">ICT Technician III</option>
                                     <option value="assist-ict-eng-3">Assistant ICT Engineer III</option>
                                     <option value="ict-eng-3">ICT Engineer III</option>
+                                    <option value="admin-officer-2">Administrative Officer II</option>
+                                    <option value="accounts-clerk-1">Accounts Clerk I</option>
+                                    <option value="teacher-primary">Primary School Teacher</option>
+                                    <option value="nurse-staff">Staff Nurse</option>
                                 </select>
                                 <input type="text" class="form-control mt-2" id="position-custom" placeholder="Enter your job title">
                                 <div class="form-text">Select a preset position or enter your custom job title</div>
@@ -1260,17 +1265,26 @@
 
             <div class="comparison-card">
                 <div class="row mb-3">
-                    <div class="col-md-4 mb-2">
+                    <div class="col-md-3 mb-2">
+                        <label for="quick-increase-select" class="form-label">
+                            <i class="fas fa-lightning me-1"></i> Quick Select
+                        </label>
+                        <select class="form-select" id="quick-increase-select">
+                            <option value="custom">Custom Percentage</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-2">
                         <label for="increase-percentage" class="form-label">
                             <i class="fas fa-arrow-up me-1"></i> Increase Percentage
                         </label>
                         <div class="input-group">
-                            <input type="number" class="form-control" id="increase-percentage" value="6" min="0" max="100" step="0.1">
+                            <input type="number" class="form-control" id="increase-percentage" value="8" min="0" max="100" step="0.1">
                             <span class="input-group-text">%</span>
                         </div>
                     </div>
 
-                    <div class="col-md-4 mb-2">
+                    <div class="col-md-3 mb-2">
                         <label class="form-label d-block">
                             <i class="fas fa-coins me-1"></i> Is the increase taxable?
                         </label>
@@ -1288,7 +1302,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-check form-switch mb-2">
                             <input class="form-check-input" type="checkbox" id="toggle-retroactive">
                             <label class="form-check-label" for="toggle-retroactive">
@@ -1297,9 +1311,27 @@
                         </div>
                         <div id="retroactive-section" class="d-none">
                             <div class="input-group">
-                                <input type="number" class="form-control" id="retroactive-months" value="1" min="1" max="12">
+                                <input type="number" class="form-control" id="retroactive-months" value="6" min="1" max="12">
                                 <span class="input-group-text">Months</span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Gratuity Month Toggle -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="toggle-gratuity-month">
+                            <label class="form-check-label" for="toggle-gratuity-month">
+                                <i class="fas fa-gift me-1"></i> This is a gratuity payment month (like July 2025)
+                            </label>
+                        </div>
+                        <div id="gratuity-month-section" class="d-none mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                This will calculate your total payment including both salary increase and gratuity payment in the same month.
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -1411,7 +1443,7 @@
                                     </div>
                                     <div class="d-flex justify-content-between mb-1">
                                         <small class="text-muted">Gratuity Payment:</small>
-                                        <span class="result-value positive" id="new-month-twelve-gratuity">$0.00</span>
+                                        <span id="new-month-twelve-gratuity" class="fw-bold text-success">$0.00</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-1">
                                         <small class="text-muted">Vacation Allowance:</small>
@@ -1443,6 +1475,45 @@
                                 <div class="form-text mt-2">
                                     <i class="fas fa-info-circle me-1"></i>
                                     This reflects your net pay for the month you receive the retroactive lump sum.
+                                </div>
+                            </div>
+
+                            <!-- NEW: Gratuity Month Results Display -->
+                            <div id="gratuity-month-results-display" class="d-none mt-4">
+                                <div class="gratuity-month-section">
+                                    <h5><i class="fas fa-gift me-2"></i>Gratuity Payment Month Calculation</h5>
+                                    <p id="gratuity-month-message" class="mb-3">
+                                        This month you receive both your salary increase and gratuity payment.
+                                    </p>
+                                    
+                                    <div class="gratuity-month-card">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="text-center">
+                                                    <div class="h4 mb-1" id="gratuity-month-net-pay">$0.00</div>
+                                                    <small>Regular Net Salary</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="text-center">
+                                                    <div class="h4 mb-1" id="gratuity-month-gratuity-payment">$0.00</div>
+                                                    <small>Gratuity Payment</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="text-center">
+                                                    <div class="h3 mb-1 fw-bold" id="gratuity-month-total-pay">$0.00</div>
+                                                    <small><strong>TOTAL MONTH PAYMENT</strong></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert alert-warning mt-3">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Note:</strong> This calculation shows your combined salary increase effect plus gratuity payment for months like July 2025. 
+                                        Your regular monthly salary will be the new increased amount going forward.
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1546,6 +1617,7 @@
                 </small>
             </div>
         </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
