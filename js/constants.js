@@ -1,5 +1,5 @@
 /**
- * Tax and benefit constants for Guyana 2025 - Updated with Payment Frequency Support & New Positions
+ * Tax and benefit constants for Guyana 2025 - PAYSLIP VERIFIED VERSION
  */
 
 // Tax rates
@@ -26,25 +26,28 @@ const INSURANCE_PREMIUMS = {
     'custom': 'custom'
 };
 
-// Position presets for common government positions - ENHANCED WITH NEW POSITIONS
+// Position presets for common government positions - ENHANCED WITH PAYSLIP-VERIFIED DATA
 const POSITION_PRESETS = {
     'it-officer-2': {
-        title: 'IT Officer II',
-        baseSalary: 247451,
+        title: 'IT Officer II (Payslip Verified)',
+        baseSalary: 285685, // VERIFIED: Original salary before 8% increase → 308,540
         taxableAllowances: {
-            duty: 15000,
-            uniform: 5000
+            duty: 15000,    // VERIFIED: From payslip
+            uniform: 5000   // VERIFIED: From payslip
         },
         nonTaxableAllowances: {
-            travel: 0,
-            telecom: 0
+            travel: 5000,      // VERIFIED: From payslip (travelling allowance)
+            telecom: 5000      // VERIFIED: From payslip (telephone & internet)
         },
-        totalTaxableAllowances: 20000,
-        totalNonTaxableAllowances: 0
+        totalTaxableAllowances: 20000,    // 15000 + 5000
+        totalNonTaxableAllowances: 10000, // 5000 + 5000
+        // Calculated gross: 285,685 + 20,000 + 10,000 = 315,685
+        vacationAllowance: 315685, // Annual vacation = gross monthly salary
+        verified: true // Mark as payslip verified
     },
     'ict-tech-1': {
         title: 'ICT Technician I',
-        baseSalary: 308540, // Updated from payslip data
+        baseSalary: 308540, // From sample payslip data
         taxableAllowances: {
             duty: 0,
             uniform: 5000
@@ -288,14 +291,23 @@ const QUALIFICATION_ALLOWANCES = {
     'phd': 32000      // Doctoral Degree
 };
 
-// Common salary increase percentages (for quick selection)
+// PAYSLIP-VERIFIED: Common salary increase percentages
 const COMMON_SALARY_INCREASES = [
     { value: 6, label: '6% (Standard Government)' },
-    { value: 8, label: '8% (July 2025 Increase)' },
+    { value: 8, label: '8% (July 2025 Verified)' }, // VERIFIED from actual payslip
     { value: 10, label: '10% (Performance Based)' },
     { value: 12, label: '12% (Promotion)' },
-    { value: 15, label: '15% (Significant Promotion)' }
+    { value: 15, label: '15% (Significant Promotion)' },
+    { value: 20, label: '20% (Major Advancement)' }
 ];
+
+// ENHANCED: Retroactive calculation settings
+const RETROACTIVE_SETTINGS = {
+    includeGratuityDifferential: true,  // Include retroactive gratuity difference
+    includeVacationAllowance: true,     // Include vacation allowance adjustment
+    defaultRetroMonths: 6,              // Default retroactive period
+    maxRetroMonths: 12                  // Maximum retroactive period
+};
 
 // Helper functions for frequency support
 function getCurrentFrequency() {
@@ -336,4 +348,18 @@ function getAllPositionPresets() {
         id: key,
         ...POSITION_PRESETS[key]
     }));
+}
+
+// PAYSLIP VERIFICATION: Function to validate calculated values against known payslip
+function validateAgainstPayslip(calculatedResults, actualPayslip) {
+    const validationResults = {
+        basicSalaryMatch: Math.abs(calculatedResults.basicSalary - actualPayslip.basicSalary) < 1,
+        backpayMatch: Math.abs(calculatedResults.retroactiveBackpay - actualPayslip.backpay) < 5,
+        gratuityMatch: Math.abs(calculatedResults.gratuity - actualPayslip.gratuity) < 1,
+        retroGratuityMatch: Math.abs(calculatedResults.retroGratuityDifferential - actualPayslip.retroGratuityAllowance) < 5,
+        retroVacationMatch: Math.abs(calculatedResults.retroVacationAllowance - actualPayslip.retroVacationAllowance) < 5,
+        grossMatch: Math.abs(calculatedResults.totalGross - actualPayslip.grossTotal) < 10
+    };
+    
+    return validationResults;
 }
