@@ -1,5 +1,5 @@
 /**
- * Salary Increase Calculator Functions - FIXED VERSION
+ * Salary Increase Calculator Functions - ENHANCED VERSION with Gratuity Month Support
  */
 
 /**
@@ -25,6 +25,59 @@ function showSalaryIncreaseSection() {
             }
         });
         toggleRetroactive.setAttribute('data-listener-added', 'true');
+    }
+
+    // Setup listener for gratuity month toggle if not already set up
+    const toggleGratuityMonth = document.getElementById('toggle-gratuity-month');
+    if (toggleGratuityMonth && !toggleGratuityMonth.hasAttribute('data-listener-added')) {
+        toggleGratuityMonth.addEventListener('change', function() {
+            const gratuityMonthSection = document.getElementById('gratuity-month-section');
+            const gratuityMonthResultsDisplay = document.getElementById('gratuity-month-results-display');
+            if (this.checked) {
+                if (gratuityMonthSection) gratuityMonthSection.classList.remove('d-none');
+            } else {
+                if (gratuityMonthSection) gratuityMonthSection.classList.add('d-none');
+                if (gratuityMonthResultsDisplay) gratuityMonthResultsDisplay.classList.add('d-none');
+            }
+        });
+        toggleGratuityMonth.setAttribute('data-listener-added', 'true');
+    }
+
+    // Populate quick increase percentage dropdown
+    populateQuickIncreaseOptions();
+}
+
+/**
+ * Populate quick increase percentage options
+ */
+function populateQuickIncreaseOptions() {
+    const quickIncreaseSelect = document.getElementById('quick-increase-select');
+    if (quickIncreaseSelect && COMMON_SALARY_INCREASES) {
+        // Clear existing options except the first one
+        while (quickIncreaseSelect.children.length > 1) {
+            quickIncreaseSelect.removeChild(quickIncreaseSelect.lastChild);
+        }
+        
+        // Add common increase options
+        COMMON_SALARY_INCREASES.forEach(increase => {
+            const option = document.createElement('option');
+            option.value = increase.value;
+            option.textContent = increase.label;
+            quickIncreaseSelect.appendChild(option);
+        });
+        
+        // Add event listener for quick selection
+        if (!quickIncreaseSelect.hasAttribute('data-listener-added')) {
+            quickIncreaseSelect.addEventListener('change', function() {
+                if (this.value !== 'custom') {
+                    const increasePercentageInput = document.getElementById('increase-percentage');
+                    if (increasePercentageInput) {
+                        increasePercentageInput.value = this.value;
+                    }
+                }
+            });
+            quickIncreaseSelect.setAttribute('data-listener-added', 'true');
+        }
     }
 }
 
@@ -56,11 +109,15 @@ function calculateWithIncrease() {
         const retroactiveMonthsElement = document.getElementById('retroactive-months');
         const retroactiveMonths = isRetroactive && retroactiveMonthsElement ? (parseInt(retroactiveMonthsElement.value) || 0) : 0;
 
+        // Get gratuity month parameters
+        const toggleGratuityMonthElement = document.getElementById('toggle-gratuity-month');
+        const isGratuityMonth = toggleGratuityMonthElement ? toggleGratuityMonthElement.checked : false;
+
         // Calculate new values
-        const results = calculateIncreaseResults(lastResults, increasePercentage, isTaxable, retroactiveMonths);
+        const results = calculateIncreaseResults(lastResults, increasePercentage, isTaxable, retroactiveMonths, isGratuityMonth);
         
         // Display new results
-        updateIncreaseResultsDisplay(results, lastResults, isRetroactive);
+        updateIncreaseResultsDisplay(results, lastResults, isRetroactive, isGratuityMonth);
         
     } catch (error) {
         console.error("Increase calculation error:", error);
@@ -90,9 +147,10 @@ function getCurrentResults() {
  * @param {number} increasePercentage - The percentage increase
  * @param {boolean} isTaxable - Whether the increase is taxable
  * @param {number} retroactiveMonths - Number of months for retroactive pay
+ * @param {boolean} isGratuityMonth - Whether this is a gratuity payment month
  * @returns {Object} The new calculation results
  */
-function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, retroactiveMonths) {
+function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, retroactiveMonths, isGratuityMonth) {
     // Calculate the increase amount based on baseResults.basicSalary
     const monthlyBasicIncreaseAmount = baseResults.basicSalary * (increasePercentage / 100);
     
@@ -184,6 +242,22 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
         newResults.netPayWithRetroactiveLumpSum = grossForRetroMonth - retroNisContribution - retroIncomeTax - newResults.loanPayment - newResults.creditUnionDeduction;
     }
 
+    // --- Gratuity Month Calculation ---
+    newResults.gratuityMonthNetPay = 0;
+    newResults.gratuityMonthTotalPay = 0;
+    newResults.isGratuityMonth = isGratuityMonth;
+
+    if (isGratuityMonth) {
+        // Calculate total payment for gratuity month (regular net + gratuity payment)
+        newResults.gratuityMonthNetPay = newResults.monthlyNetSalary;
+        newResults.gratuityMonthTotalPay = newResults.monthlyNetSalary + newResults.sixMonthGratuity;
+        
+        // If also retroactive, add retroactive lump sum to gratuity month
+        if (retroactiveMonths > 0) {
+            newResults.gratuityMonthTotalPay = newResults.netPayWithRetroactiveLumpSum + newResults.sixMonthGratuity;
+        }
+    }
+
     // Recalculate annual figures based on new monthly net salary
     newResults.annualGrossIncome = newResults.regularMonthlyGrossIncome * 12;
     newResults.annualNisContribution = newResults.nisContribution * 12;
@@ -240,8 +314,9 @@ function safeUpdateIncreaseElement(elementId, value) {
  * @param {Object} results - The new calculation results
  * @param {Object} baseResults - The original calculation results
  * @param {boolean} isRetroactive - Whether retroactive pay was calculated
+ * @param {boolean} isGratuityMonth - Whether this is a gratuity payment month
  */
-function updateIncreaseResultsDisplay(results, baseResults, isRetroactive) {
+function updateIncreaseResultsDisplay(results, baseResults, isRetroactive, isGratuityMonth) {
     try {
         const increaseResults = document.getElementById('increase-results');
         if (increaseResults) {
@@ -298,6 +373,31 @@ function updateIncreaseResultsDisplay(results, baseResults, isRetroactive) {
                 retroactiveResultsDisplay.classList.add('d-none');
             }
         }
+
+        // Gratuity Month Results Display - NEW FEATURE
+        const gratuityMonthResultsDisplay = document.getElementById('gratuity-month-results-display');
+        if (isGratuityMonth) {
+            if (gratuityMonthResultsDisplay) {
+                gratuityMonthResultsDisplay.classList.remove('d-none');
+            }
+            safeUpdateIncreaseElement('gratuity-month-net-pay', safeCurrency(results.gratuityMonthNetPay || 0));
+            safeUpdateIncreaseElement('gratuity-month-gratuity-payment', safeCurrency(results.sixMonthGratuity || 0));
+            safeUpdateIncreaseElement('gratuity-month-total-pay', safeCurrency(results.gratuityMonthTotalPay || 0));
+            
+            // Update summary message
+            const gratuityMonthMessage = document.getElementById('gratuity-month-message');
+            if (gratuityMonthMessage) {
+                let message = `This month you receive both your salary increase and gratuity payment totaling ${safeCurrency(results.gratuityMonthTotalPay)}.`;
+                if (isRetroactive && results.totalRetroactiveLumpSum > 0) {
+                    message = `This month you receive your salary increase, retroactive payment (${safeCurrency(results.totalRetroactiveLumpSum)}), and gratuity payment - an exceptional total of ${safeCurrency(results.gratuityMonthTotalPay)}!`;
+                }
+                gratuityMonthMessage.textContent = message;
+            }
+        } else {
+            if (gratuityMonthResultsDisplay) {
+                gratuityMonthResultsDisplay.classList.add('d-none');
+            }
+        }
         
         console.log('Salary increase display updated successfully');
         
@@ -311,5 +411,25 @@ function updateIncreaseResultsDisplay(results, baseResults, isRetroactive) {
         if (increaseResults) {
             increaseResults.classList.remove('d-none');
         }
+    }
+}
+
+/**
+ * Show the gratuity month section - NEW FEATURE
+ */
+function showGratuityMonthSection() {
+    const gratuityMonthSection = document.getElementById('gratuity-month-section');
+    if (gratuityMonthSection) {
+        gratuityMonthSection.classList.remove('d-none');
+    }
+}
+
+/**
+ * Hide the gratuity month section
+ */
+function hideGratuityMonthSection() {
+    const gratuityMonthSection = document.getElementById('gratuity-month-section');
+    if (gratuityMonthSection) {
+        gratuityMonthSection.classList.add('d-none');
     }
 }
