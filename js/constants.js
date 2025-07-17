@@ -1,5 +1,5 @@
 /**
- * Tax and benefit constants for Guyana 2025 - Updated with Payment Frequency Support
+ * Tax and benefit constants for Guyana 2025 - Updated with Payment Frequency Support & New Positions
  */
 
 // Tax rates
@@ -26,11 +26,11 @@ const INSURANCE_PREMIUMS = {
     'custom': 'custom'
 };
 
-// Position presets for ICT positions
+// Position presets for common government positions - ENHANCED WITH NEW POSITIONS
 const POSITION_PRESETS = {
-    'ict-tech-1': {
-        title: 'ICT Technician I',
-        baseSalary: 206300,
+    'it-officer-2': {
+        title: 'IT Officer II',
+        baseSalary: 247451,
         taxableAllowances: {
             duty: 15000,
             uniform: 5000
@@ -41,6 +41,20 @@ const POSITION_PRESETS = {
         },
         totalTaxableAllowances: 20000,
         totalNonTaxableAllowances: 0
+    },
+    'ict-tech-1': {
+        title: 'ICT Technician I',
+        baseSalary: 308540, // Updated from payslip data
+        taxableAllowances: {
+            duty: 0,
+            uniform: 5000
+        },
+        nonTaxableAllowances: {
+            travel: 5000,
+            telecom: 5000
+        },
+        totalTaxableAllowances: 5000,
+        totalNonTaxableAllowances: 10000
     },
     'ict-tech-2': {
         title: 'ICT Technician II',
@@ -94,8 +108,64 @@ const POSITION_PRESETS = {
             travel: 10000,
             telecom: 5000
         },
-        totalTaxableAllowances: 85000,
+        totalTaxableAllowances: 5000,
         totalNonTaxableAllowances: 15000
+    },
+    'admin-officer-2': {
+        title: 'Administrative Officer II',
+        baseSalary: 180000,
+        taxableAllowances: {
+            duty: 10000,
+            uniform: 3000
+        },
+        nonTaxableAllowances: {
+            travel: 0,
+            telecom: 0
+        },
+        totalTaxableAllowances: 13000,
+        totalNonTaxableAllowances: 0
+    },
+    'accounts-clerk-1': {
+        title: 'Accounts Clerk I',
+        baseSalary: 150000,
+        taxableAllowances: {
+            duty: 8000,
+            uniform: 3000
+        },
+        nonTaxableAllowances: {
+            travel: 0,
+            telecom: 0
+        },
+        totalTaxableAllowances: 11000,
+        totalNonTaxableAllowances: 0
+    },
+    'teacher-primary': {
+        title: 'Primary School Teacher',
+        baseSalary: 185000,
+        taxableAllowances: {
+            duty: 0,
+            uniform: 0
+        },
+        nonTaxableAllowances: {
+            travel: 15000,
+            station: 5000
+        },
+        totalTaxableAllowances: 0,
+        totalNonTaxableAllowances: 20000
+    },
+    'nurse-staff': {
+        title: 'Staff Nurse',
+        baseSalary: 220000,
+        taxableAllowances: {
+            duty: 20000,
+            uniform: 5000
+        },
+        nonTaxableAllowances: {
+            travel: 8000,
+            station: 5000
+        },
+        totalTaxableAllowances: 25000,
+        totalNonTaxableAllowances: 13000
     }
 };
 
@@ -218,6 +288,15 @@ const QUALIFICATION_ALLOWANCES = {
     'phd': 32000      // Doctoral Degree
 };
 
+// Common salary increase percentages (for quick selection)
+const COMMON_SALARY_INCREASES = [
+    { value: 6, label: '6% (Standard Government)' },
+    { value: 8, label: '8% (July 2025 Increase)' },
+    { value: 10, label: '10% (Performance Based)' },
+    { value: 12, label: '12% (Promotion)' },
+    { value: 15, label: '15% (Significant Promotion)' }
+];
+
 // Helper functions for frequency support
 function getCurrentFrequency() {
     const frequencySelect = document.getElementById('payment-frequency');
@@ -244,4 +323,17 @@ function convertToMonthly(amount, sourceFrequency = null) {
 function getQualificationAllowanceForFrequency(qualificationType) {
     const frequency = getCurrentFrequency();
     return QUALIFICATION_ALLOWANCES_BY_FREQUENCY[frequency][qualificationType] || 0;
+}
+
+// Enhanced function to get position preset by ID
+function getPositionPreset(presetId) {
+    return POSITION_PRESETS[presetId] || null;
+}
+
+// Function to get all available position presets
+function getAllPositionPresets() {
+    return Object.keys(POSITION_PRESETS).map(key => ({
+        id: key,
+        ...POSITION_PRESETS[key]
+    }));
 }
