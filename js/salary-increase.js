@@ -1,5 +1,6 @@
 /**
- * Salary Increase Calculator Functions - ENHANCED VERSION with Gratuity Month Support
+ * Salary Increase Calculator Functions - ENHANCED VERSION with Complete Retroactive Support
+ * Updated to match real payslip calculations including retro gratuity and vacation allowances
  */
 
 /**
@@ -205,16 +206,37 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
                                   newResults.loanPayment -
                                   newResults.creditUnionDeduction;
 
-    // --- Retroactive Calculation ---
+    // --- Enhanced Retroactive Calculation ---
     newResults.retroactiveMonthlyIncrease = 0;
     newResults.totalRetroactiveLumpSum = 0;
+    newResults.retroGratuityDifferential = 0;
+    newResults.retroVacationAllowance = 0;
+    newResults.totalRetroGross = 0;
     newResults.netPayWithRetroactiveLumpSum = 0;
 
     if (retroactiveMonths > 0) {
+        // Basic salary retroactive
         newResults.retroactiveMonthlyIncrease = monthlyBasicIncreaseAmount;
         newResults.totalRetroactiveLumpSum = monthlyBasicIncreaseAmount * retroactiveMonths;
 
-        // To calculate net pay for the retroactive month
+        // Calculate retroactive gratuity differential
+        const oldMonthlyGratuity = baseResults.basicSalary * (baseResults.gratuityRate / 100);
+        const newMonthlyGratuity = newResults.basicSalary * (newResults.gratuityRate / 100);
+        const monthlyGratuityIncrease = newMonthlyGratuity - oldMonthlyGratuity;
+        newResults.retroGratuityDifferential = monthlyGratuityIncrease * retroactiveMonths;
+
+        // Calculate retroactive vacation allowance
+        // This is typically based on the gross salary increase applied to vacation allowance
+        const vacationAllowanceIncrease = (baseResults.vacationAllowance || 0) * (increasePercentage / 100);
+        newResults.retroVacationAllowance = vacationAllowanceIncrease;
+
+        // Calculate total retroactive gross (all retroactive components)
+        newResults.totalRetroGross = newResults.totalRetroactiveLumpSum + 
+                                    newResults.retroGratuityDifferential + 
+                                    newResults.retroVacationAllowance;
+
+        // To calculate net pay for the retroactive month, we need to account for all retroactive components
+        // The basic salary backpay is taxable, but retro gratuity and vacation are typically non-taxable
         const grossForRetroMonth = newResults.regularMonthlyGrossIncome + newResults.totalRetroactiveLumpSum;
 
         // Recalculate PA/NIS based on this temporarily inflated gross for retro month
@@ -238,24 +260,37 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
                             ((retroTaxableIncome - TAX_THRESHOLD) * TAX_RATE_2);
         }
 
-        // Calculate Net Pay for the retroactive payment month
+        // Calculate Net Pay for the retroactive payment month (including only taxable retro components)
         newResults.netPayWithRetroactiveLumpSum = grossForRetroMonth - retroNisContribution - retroIncomeTax - newResults.loanPayment - newResults.creditUnionDeduction;
     }
 
-    // --- Gratuity Month Calculation ---
+    // --- Enhanced Gratuity Month Calculation ---
     newResults.gratuityMonthNetPay = 0;
     newResults.gratuityMonthTotalPay = 0;
     newResults.isGratuityMonth = isGratuityMonth;
 
     if (isGratuityMonth) {
-        // Calculate total payment for gratuity month (regular net + gratuity payment)
-        newResults.gratuityMonthNetPay = newResults.monthlyNetSalary;
-        newResults.gratuityMonthTotalPay = newResults.monthlyNetSalary + newResults.sixMonthGratuity;
-        
-        // If also retroactive, add retroactive lump sum to gratuity month
+        // Start with the regular monthly net salary after the increase
+        let calculatedTotalPayment = newResults.monthlyNetSalary;
+
+        // Add the current month's gratuity payment (non-taxable)
+        calculatedTotalPayment += newResults.sixMonthGratuity;
+
+        // If there's retroactive pay, add all retroactive components
         if (retroactiveMonths > 0) {
-            newResults.gratuityMonthTotalPay = newResults.netPayWithRetroactiveLumpSum + newResults.sixMonthGratuity;
+            // Add the net effect of the basic salary backpay
+            const netEffectOfBasicBackpay = newResults.netPayWithRetroactiveLumpSum - newResults.monthlyNetSalary;
+            calculatedTotalPayment += netEffectOfBasicBackpay;
+
+            // Add the retroactive gratuity differential (non-taxable)
+            calculatedTotalPayment += newResults.retroGratuityDifferential;
+
+            // Add the retroactive vacation allowance (non-taxable)
+            calculatedTotalPayment += newResults.retroVacationAllowance;
         }
+
+        newResults.gratuityMonthNetPay = newResults.monthlyNetSalary;
+        newResults.gratuityMonthTotalPay = calculatedTotalPayment;
     }
 
     // Recalculate annual figures based on new monthly net salary
@@ -267,9 +302,14 @@ function calculateIncreaseResults(baseResults, increasePercentage, isTaxable, re
     // Recalculate annual total
     newResults.annualTotal = (newResults.monthlyNetSalary * 12) + newResults.annualGratuityTotal + (newResults.vacationAllowance || 0);
     
-    // Add retroactive lump sum to annual total if applicable
+    // Add all retroactive components to annual total if applicable
     if (retroactiveMonths > 0) {
-        newResults.annualTotal += newResults.totalRetroactiveLumpSum;
+        // Add net effect of basic salary backpay
+        const annualNetBackpayEffect = (newResults.netPayWithRetroactiveLumpSum - newResults.monthlyNetSalary);
+        newResults.annualTotal += annualNetBackpayEffect;
+        
+        // Add retroactive gratuity and vacation (non-taxable)
+        newResults.annualTotal += newResults.retroGratuityDifferential + newResults.retroVacationAllowance;
     }
     
     // Recalculate special month totals
@@ -359,14 +399,23 @@ function updateIncreaseResultsDisplay(results, baseResults, isRetroactive, isGra
         safeUpdateIncreaseElement('new-month-twelve-vacation', safeCurrency(results.vacationAllowance || 0));
         safeUpdateIncreaseElement('new-month-twelve-total', safeCurrency(results.monthTwelveTotal));
 
-        // Retroactive Results Display - SAFE UPDATES
+        // Enhanced Retroactive Results Display - COMPREHENSIVE UPDATE
         const retroactiveResultsDisplay = document.getElementById('retroactive-results-display');
         if (isRetroactive && results.totalRetroactiveLumpSum > 0) {
             if (retroactiveResultsDisplay) {
                 retroactiveResultsDisplay.classList.remove('d-none');
             }
+            
+            // Basic retroactive components
             safeUpdateIncreaseElement('retro-monthly-increase', safeCurrency(results.retroactiveMonthlyIncrease || 0));
             safeUpdateIncreaseElement('total-retro-lump-sum', safeCurrency(results.totalRetroactiveLumpSum || 0));
+            
+            // Enhanced retroactive components
+            safeUpdateIncreaseElement('retro-gratuity-differential', safeCurrency(results.retroGratuityDifferential || 0));
+            safeUpdateIncreaseElement('retro-vacation-allowance', safeCurrency(results.retroVacationAllowance || 0));
+            safeUpdateIncreaseElement('total-retro-gross', safeCurrency(results.totalRetroGross || 0));
+            
+            // Net pay with all retroactive components
             safeUpdateIncreaseElement('net-pay-with-retro', safeCurrency(results.netPayWithRetroactiveLumpSum || 0));
         } else {
             if (retroactiveResultsDisplay) {
@@ -374,7 +423,7 @@ function updateIncreaseResultsDisplay(results, baseResults, isRetroactive, isGra
             }
         }
 
-        // Gratuity Month Results Display - NEW FEATURE
+        // Enhanced Gratuity Month Results Display
         const gratuityMonthResultsDisplay = document.getElementById('gratuity-month-results-display');
         if (isGratuityMonth) {
             if (gratuityMonthResultsDisplay) {
@@ -384,12 +433,12 @@ function updateIncreaseResultsDisplay(results, baseResults, isRetroactive, isGra
             safeUpdateIncreaseElement('gratuity-month-gratuity-payment', safeCurrency(results.sixMonthGratuity || 0));
             safeUpdateIncreaseElement('gratuity-month-total-pay', safeCurrency(results.gratuityMonthTotalPay || 0));
             
-            // Update summary message
+            // Update summary message with comprehensive breakdown
             const gratuityMonthMessage = document.getElementById('gratuity-month-message');
             if (gratuityMonthMessage) {
-                let message = `This month you receive both your salary increase and gratuity payment totaling ${safeCurrency(results.gratuityMonthTotalPay)}.`;
-                if (isRetroactive && results.totalRetroactiveLumpSum > 0) {
-                    message = `This month you receive your salary increase, retroactive payment (${safeCurrency(results.totalRetroactiveLumpSum)}), and gratuity payment - an exceptional total of ${safeCurrency(results.gratuityMonthTotalPay)}!`;
+                let message = `This month you receive your salary increase and gratuity payment totaling ${safeCurrency(results.gratuityMonthTotalPay)}.`;
+                if (isRetroactive && results.totalRetroGross > 0) {
+                    message = `This month includes all retroactive components: Basic Backpay (${safeCurrency(results.totalRetroactiveLumpSum)}), Retro Gratuity (${safeCurrency(results.retroGratuityDifferential)}), Retro Vacation (${safeCurrency(results.retroVacationAllowance)}), plus current gratuity payment - totaling ${safeCurrency(results.gratuityMonthTotalPay)}!`;
                 }
                 gratuityMonthMessage.textContent = message;
             }
@@ -399,7 +448,9 @@ function updateIncreaseResultsDisplay(results, baseResults, isRetroactive, isGra
             }
         }
         
-        console.log('Salary increase display updated successfully');
+        console.log('Enhanced salary increase display updated successfully');
+        console.log('Total retroactive gross:', results.totalRetroGross);
+        console.log('Gratuity month total pay:', results.gratuityMonthTotalPay);
         
     } catch (error) {
         console.error('Error in salary increase display:', error);
@@ -415,7 +466,7 @@ function updateIncreaseResultsDisplay(results, baseResults, isRetroactive, isGra
 }
 
 /**
- * Show the gratuity month section - NEW FEATURE
+ * Show the gratuity month section
  */
 function showGratuityMonthSection() {
     const gratuityMonthSection = document.getElementById('gratuity-month-section');
